@@ -20,10 +20,12 @@
 #define BALL_HEIGHT 10.0f
 #define BALL_WIDTH 10.0f
 
-#define CEILING_HEIGHT 5.0f
-#define FLOOR_HEIGHT 5.0f
+#define CEILING_HEIGHT 2.0f
+#define FLOOR_HEIGHT 2.0f
 
 #define BALL_VELOCITY 200.0f
+
+//#define ENABLE_GLOW
 
 typedef enum { TEST_PONG_PLAYING, TESTS_PONG_GAMEOVER } TEST_PONG_STATE;
 
@@ -171,7 +173,7 @@ typedef enum { TEST_PONG_PLAYING, TESTS_PONG_GAMEOVER } TEST_PONG_STATE;
 
 - (void)setupFloorAndCeiling
 {
-    _ceiling = [CCNodeColor nodeWithColor:[CCColor greenColor]];
+    _ceiling = [CCNodeColor nodeWithColor:[CCColor lightGrayColor]];
     _ceiling.anchorPoint = ccp(0.5, 1.0);
     _ceiling.contentSize = CGSizeMake(_designSize.width, CEILING_HEIGHT);
     
@@ -182,7 +184,7 @@ typedef enum { TEST_PONG_PLAYING, TESTS_PONG_GAMEOVER } TEST_PONG_STATE;
     
     _ceiling.position = ccp(_designSize.width * 0.5f, _designSize.height);
     
-    _floor = [CCNodeColor nodeWithColor:[CCColor greenColor]];
+    _floor = [CCNodeColor nodeWithColor:[CCColor lightGrayColor]];
     _floor.anchorPoint = ccp(0.5f, 0.0f);
     _floor.contentSize = CGSizeMake(_designSize.width, FLOOR_HEIGHT);
     
@@ -196,11 +198,30 @@ typedef enum { TEST_PONG_PLAYING, TESTS_PONG_GAMEOVER } TEST_PONG_STATE;
 
 - (void)setupBackgroundScene
 {
-    CCSprite* beigePannel = [CCSprite spriteWithImageNamed:@"panelInset_beige.png"];
-    beigePannel.positionType = CCPositionTypeNormalized;
-    beigePannel.position = ccp(0.3, 0.3);
+    CCSprite* bg = [CCSprite spriteWithImageNamed:@"starynight.png"];
+    bg.scale = 1.0f;
+    bg.position = ccp(_designSize.width * 0.5f, _designSize.height * 0.5f);
+    [_pixellateEffectNode addChild:bg];
+
+    CCSprite* dirtPlatform = [CCSprite spriteWithImageNamed:@"planet1.png"]; // horrible asset choice, just a place holder.
+    dirtPlatform.positionType = CCPositionTypeNormalized;
+    dirtPlatform.position = ccp(0.3, 0.3);
+    dirtPlatform.scale = 0.2f;
+
+#ifdef ENABLE_GLOW
+    CCEffectNode* glowNode = [[CCEffectNode alloc] initWithWidth:_designSize.width height:_designSize.height];
+    CCEffectGlow* glow = [CCEffectGlow effectWithBlurStrength:0.002f];
+    [glowNode addEffect:glow];
+
+    [glowNode addChild:dirtPlatform];
+    [_pixellateEffectNode addChild:glowNode];
+#else
+//    [_pixellateEffectNode addChild:dirtPlatform];
+#endif
     
-    [_pixellateEffectNode addChild:beigePannel];
+
+    
+
 }
 
 - (void)setupScoredLabel
@@ -241,10 +262,7 @@ typedef enum { TEST_PONG_PLAYING, TESTS_PONG_GAMEOVER } TEST_PONG_STATE;
         // FIXME - Oleg. An effectnodes position without an actual effect handles behave different when an effect is added.
         _pixellateEffectNode.position = ccp(0.0f, 0.0f);
         [_pixellateEffectNode addEffect:_pixellateEffect];
-        
-//        [self setupBall];
-//        _ballEffectNode.physicsBody.velocity = ccp(0, 0);
-        
+                
         [_pixellateEffectNode addChild:_scoredLabel];
         
         [self schedule:@selector(increasePixellate:) interval:1.0f/60.0f repeat:10 delay:1.0f];
@@ -272,7 +290,6 @@ typedef enum { TEST_PONG_PLAYING, TESTS_PONG_GAMEOVER } TEST_PONG_STATE;
     [_pixellateEffectNode removeEffect:_pixellateEffect];
   
     [self setupBall];
-//    _ballEffectNode.physicsBody.velocity = ccp(-BALL_VELOCITY, 0);
     
     [_pixellateEffectNode removeChild:_scoredLabel];
     
