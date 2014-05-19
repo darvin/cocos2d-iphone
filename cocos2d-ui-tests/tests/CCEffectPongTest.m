@@ -24,8 +24,9 @@
 #define CEILING_HEIGHT 5.0f
 #define FLOOR_HEIGHT 5.0f
 
+typedef enum { TEST_PONG_PLAYING, TESTS_PONG_GAMEOVER } TEST_PONG_STATE;
 
-@interface CCEffectPongTest : TestBase @end
+@interface CCEffectPongTest : TestBase <CCPhysicsCollisionDelegate> @end
 
 @implementation CCEffectPongTest {
     CCNodeColor* _playerPaddle;
@@ -38,37 +39,57 @@
     
     CCNodeColor* _ceiling;
     CCNodeColor* _floor;
+    
+    CCEffectNode* _pixellateEffectNode;
+    CCEffectPixellate* _pixellateEffect;
+    
+    TEST_PONG_STATE _gameState;
 }
 
-- (float)centerPaddleY:(float)y
+- (BOOL)canPaddleMoveTo:(float)y
 {
-    float centerY = y - PADDLE_HEIGHT * 0.5f;
-    return centerY;
+    return !((y + (PADDLE_HEIGHT * 0.5f) > _designSize.height - CEILING_HEIGHT) ||
+            (y - (PADDLE_HEIGHT * 0.5f) < FLOOR_HEIGHT));
 }
 
 - (void)setupEffectPongTest
 {
     self.userInteractionEnabled = YES;
     
+    _gameState = TEST_PONG_PLAYING;
+    
     CCPhysicsNode *physics = [CCPhysicsNode node];
-    //	physics.debugDraw = YES;
-    //[physics setCollisionDelegate:self];
-	[self.contentNode addChild:physics];
+    //physics.debugDraw = YES;
+    [physics setCollisionDelegate:self];
+	//[self.contentNode addChild:physics];
     
     _designSize = [[CCDirector sharedDirector] designSize];
-    
+    _designSize.height -= _headerBg.contentSize.height;
+
+    [self setupBall];
+    [physics addChild:_ballEffectNode];
+
     [self setupPlayerPaddle];
     [physics addChild:_playerPaddle];
     
     [self setupAIPaddle];
     [physics addChild:_aiPaddle];
     
-    [self setupBall];
-    [physics addChild:_ballEffectNode];
     
     [self setupFloorAndCeiling];
     [physics addChild:_ceiling];
     [physics addChild:_floor];
+    
+    _pixellateEffectNode = [[CCEffectNode alloc] initWithWidth:_designSize.width height:_designSize.height];
+    
+    // HACK
+    _pixellateEffectNode.position = ccp(_designSize.width * 0.5f, _designSize.height * 0.5f); // This should work with position 0,0. FIXME - Oleg. An effectnodes position without an actual effect handles behave different when an effect is added.
+    
+    _pixellateEffect = [[CCEffectPixellate alloc] initWithPixelScale:0.0001f];
+    
+    [_pixellateEffectNode addChild:physics];
+
+    [self.contentNode addChild:_pixellateEffectNode];
     
     [self schedule:@selector(sceneUpdate:) interval:1.0f/60.0f];
 }
@@ -79,7 +100,7 @@
     if(_playerPaddle == nil)
     {
         _playerPaddle = [CCNodeColor nodeWithColor:[CCColor redColor]];
-        _playerPaddle.anchorPoint = ccp(0.0, 0.0);
+        _playerPaddle.anchorPoint = ccp(0.0, 0.5);
         _playerPaddle.contentSize = CGSizeMake(PADDLE_WIDTH, PADDLE_HEIGHT);
         
         CGRect rect = {CGPointZero, _playerPaddle.contentSize};
@@ -88,7 +109,7 @@
         _playerPaddle.physicsBody.collisionType = @"playerPaddle";
     }
     
-    _playerPaddle.position = ccp(PADDLE_X_OFFSET, [self centerPaddleY:_designSize.height * 0.5f]);
+    _playerPaddle.position = ccp(PADDLE_X_OFFSET, _designSize.height * 0.5f);
 }
 
 - (void)setupAIPaddle
@@ -96,7 +117,7 @@
     if(_aiPaddle == nil)
     {
         _aiPaddle = [CCNodeColor nodeWithColor:[CCColor redColor]];
-        _aiPaddle.anchorPoint = ccp(0.0, 0.0);
+        _aiPaddle.anchorPoint = ccp(0.0, 0.5);
         _aiPaddle.contentSize = CGSizeMake(PADDLE_WIDTH, PADDLE_HEIGHT);
         
         CGRect rect = {CGPointZero, _aiPaddle.contentSize};
@@ -105,7 +126,7 @@
         _aiPaddle.physicsBody.collisionType = @"aiPaddle";
     }
     
-    _aiPaddle.position = ccp(_designSize.width - PADDLE_WIDTH - PADDLE_X_OFFSET, [self centerPaddleY:_designSize.height * 0.5f]);
+    _aiPaddle.position = ccp(_designSize.width - PADDLE_WIDTH - PADDLE_X_OFFSET, _designSize.height * 0.5f);
 }
 
 - (void)setupBall
@@ -113,9 +134,9 @@
     if(_ball == nil)
     {
         _ball = [CCSprite spriteWithImageNamed:@"sphere-23.png"];
-        _ball.anchorPoint = ccp(0.0, 0.0); // WTF!?
+        _ball.anchorPoint = ccp(0.0, 0.0); // We shouldn't have to set this here. FIXME - Oleg
         
-        CGSize size = {_ball.contentSize.width + 10, _ball.contentSize.height + 10};
+        CGSize size = {_ball.contentSize.width + 20, _ball.contentSize.height + 20};
         _ballEffectNode = [[CCEffectNode alloc] init];
         _ballEffectNode.contentSize = size;
         _ballEffectNode.anchorPoint = ccp(0.5, 0.5);
@@ -123,10 +144,11 @@
         CGRect rect = {CGPointZero, size};
         _ballEffectNode.physicsBody = [CCPhysicsBody bodyWithRect:rect cornerRadius:0.0];
         _ballEffectNode.physicsBody.collisionType = @"ball";
-        _ballEffectNode.scale = 0.3f;
+        
+        _ballEffectNode.scale = 0.1f;
         [_ballEffectNode addChild:_ball];
         
-        _ballEffect = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:GLKVector2Make(0.0, 0.0)];
+        _ballEffect = [CCEffectGaussianBlur effectWithBlurStrength:0.01f direction:GLKVector2Make(0.0, 0.0)];
         [_ballEffectNode addEffect:_ballEffect];
     }
     
@@ -138,7 +160,7 @@
 - (void)setupFloorAndCeiling
 {
     _ceiling = [CCNodeColor nodeWithColor:[CCColor greenColor]];
-    _ceiling.anchorPoint = ccp(0.0, 1.0);
+    _ceiling.anchorPoint = ccp(0.5, 1.0);
     _ceiling.contentSize = CGSizeMake(_designSize.width, CEILING_HEIGHT);
     
     CGRect rect = {CGPointZero, _ceiling.contentSize};
@@ -146,10 +168,10 @@
     _ceiling.physicsBody.type = CCPhysicsBodyTypeStatic;
     _ceiling.physicsBody.collisionType = @"ceiling";
     
-    _ceiling.position = ccp(0.0, _designSize.height);
+    _ceiling.position = ccp(_designSize.width * 0.5f, _designSize.height);
     
     _floor = [CCNodeColor nodeWithColor:[CCColor greenColor]];
-    _floor.anchorPoint = ccp(0.0, 0.0);
+    _floor.anchorPoint = ccp(0.5f, 0.0f);
     _floor.contentSize = CGSizeMake(_designSize.width, FLOOR_HEIGHT);
     
     rect.size = _floor.contentSize;
@@ -157,13 +179,16 @@
     _floor.physicsBody.type = CCPhysicsBodyTypeStatic;
     _floor.physicsBody.collisionType = @"floor";
     
-    _floor.position = ccp(0.0, 0.0);
+    _floor.position = ccp(_designSize.width * 0.5f, 0.0f);
 }
 
 - (void)sceneUpdate:(CCTime)interval
 {
-    [self updateAI];
-    [self handleOutOfBounds];
+    if(_gameState == TEST_PONG_PLAYING)
+    {
+        [self updateAI];
+        [self handleOutOfBounds];
+    }
 }
 
 #pragma mark game logic
@@ -172,7 +197,8 @@
 {
     if(_ballEffectNode.position.x + _ballEffectNode.contentSize.width * 0.5f > _designSize.width * 0.5f)
     {
-        _aiPaddle.position = ccp(_aiPaddle.position.x, [self centerPaddleY:_ballEffectNode.position.y]);
+        if([self canPaddleMoveTo:_ballEffectNode.position.y])
+            _aiPaddle.position = ccp(_aiPaddle.position.x, _ballEffectNode.position.y);
     }
 }
 
@@ -180,10 +206,28 @@
 {
     if([self ballOutOfBounds])
     {
-        [self setupPlayerPaddle];
-        [self setupAIPaddle];
-        [self setupBall];
+        _gameState = TESTS_PONG_GAMEOVER;
+        
+        // HACK
+        _pixellateEffectNode.position = ccp(0.0f, 0.0f); // FIXME - Oleg. An effectnodes position without an actual effect handles behave different when an effect is added.
+        [_pixellateEffectNode addEffect:_pixellateEffect];
+        
+        [self schedule:@selector(increasePixellate:) interval:1.0f/60.0f repeat:10 delay:0.0f];
+        [self schedule:@selector(decreasePixellate:) interval:1.0f/60.0f repeat:10 delay:0.1f];
+        [self scheduleOnce:@selector(resetGame:) delay:0.5f];
     }
+}
+
+- (void)resetGame:(CCTimer*)interval
+{
+    [self setupPlayerPaddle];
+    [self setupAIPaddle];
+    [self setupBall];
+
+    // FIXME - make sure effect node reverts back to acting as empty node after all effects have been removed
+    [_pixellateEffectNode removeEffect:_pixellateEffect];
+    
+    _gameState = TEST_PONG_PLAYING;
 }
 
 - (BOOL)ballOutOfBounds
@@ -200,7 +244,8 @@
     CGPoint location = [touch locationInNode:self];
     if(location.x < _designSize.width * 0.5f)
     {
-        _playerPaddle.position = ccp(_playerPaddle.position.x, [self centerPaddleY:location.y]);
+        if([self canPaddleMoveTo:location.y])
+            _playerPaddle.position = ccp(_playerPaddle.position.x, location.y);
     }
 }
 
@@ -209,7 +254,8 @@
     CGPoint location = [touch locationInNode:self];
     if(location.x < _designSize.width * 0.5f)
     {
-        _playerPaddle.position = ccp(_playerPaddle.position.x, [self centerPaddleY:location.y]);
+        if([self canPaddleMoveTo:location.y])
+            _playerPaddle.position = ccp(_playerPaddle.position.x, location.y);
     }
 }
 
@@ -228,7 +274,9 @@
 - (void)ccPhysicsCollisionSeparate:(CCPhysicsCollisionPair *)pair playerPaddle:(CCNode *)playerPaddle ball:(CCNode *)ball
 {
     [ball.physicsBody applyImpulse:ccp(100, 0.0)];
-    _ballEffect.blurStrength = 0.05f;
+    
+    [self schedule:@selector(increaseBallBlur:) interval:1.0f/60.0f repeat:10 delay:0.0f];
+    [self schedule:@selector(decreaseBallBlur:) interval:1.0f/60.0f repeat:10 delay:0.1f];
 }
 
 #pragma mark collision - AI
@@ -241,6 +289,31 @@
 - (void)ccPhysicsCollisionSeparate:(CCPhysicsCollisionPair *)pair aiPaddle:(CCNode *)aiPaddle ball:(CCNode *)ball
 {
     [ball.physicsBody applyImpulse:ccp(-100, 0.0)];
+    
+    [self schedule:@selector(increaseBallBlur:) interval:1.0f/60.0f repeat:10 delay:0.0f];
+    [self schedule:@selector(decreaseBallBlur:) interval:1.0f/60.0f repeat:10 delay:0.1f];
+}
+
+#pragma mark effect updates
+
+- (void)increaseBallBlur:(CCTime)interval
+{
+    _ballEffect.blurStrength += 0.01;
+}
+
+- (void)decreaseBallBlur:(CCTime)interval
+{
+    _ballEffect.blurStrength -= 0.01f;
+}
+
+- (void)increasePixellate:(CCTime)interval
+{
+    _pixellateEffect.pixelScale += 0.001f;
+}
+
+- (void)decreasePixellate:(CCTime)interval
+{
+    _pixellateEffect.pixelScale -= 0.001f;
 }
 
 @end
