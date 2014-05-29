@@ -61,6 +61,9 @@
 #elif defined(__CC_PLATFORM_MAC)
 #import "Platforms/Mac/CCDirectorMac.h"
 #define CC_DIRECTOR_DEFAULT CCDirectorDisplayLink
+#elif defined(__CC_PLATFORM_ANDROID)
+#import "Platforms/Mac/CCDirectorAndroid.h"
+#define CC_DIRECTOR_DEFAULT CCDirectorDisplayLink
 #endif
 
 #import "CCDirector_Private.h"

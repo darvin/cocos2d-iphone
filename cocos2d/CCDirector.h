@@ -63,7 +63,11 @@ typedef NS_ENUM(NSUInteger, CCDirectorProjection) {
 #define CC_VIEWCONTROLLER UIViewController
 #elif defined(__CC_PLATFORM_MAC)
 #define CC_VIEWCONTROLLER NSObject
+#elif defined(__CC_PLATFORM_ANDROID)
+#define CC_VIEWCONTROLLER NSObject
 #endif
+
+
 
 /**Class that creates and handle the main Window and manages how
 and when to execute the Scenes.
