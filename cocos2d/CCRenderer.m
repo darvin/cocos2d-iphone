@@ -606,7 +606,7 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	[self invalidateState];
 }
 
-#if defined(__CC_PLATFORM_IOS)
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 #define glBindVertexArray glBindVertexArrayOES
 #endif
 

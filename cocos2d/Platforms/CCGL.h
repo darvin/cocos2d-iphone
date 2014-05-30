@@ -41,6 +41,12 @@
 #import <OpenGL/glu.h>
 #import <Cocoa/Cocoa.h>	// needed for NSOpenGLView
 #import "Mac/CCGLView.h"
+
+#elif __CC_PLATFORM_ANDROID
+#import <OpenGLES/ES2/gl.h>
+#import <OpenGLES/ES2/glext.h>
+#import <OpenGLES/EAGL.h>
+#import "Android/CCGLView.h"
 #endif
 
 #if DEBUG
@@ -64,6 +70,18 @@ static inline void __CC_CHECK_GL_ERROR_DEBUG(const char *function, int line)
 
 // iOS
 #if __CC_PLATFORM_IOS
+#define	glClearDepth				glClearDepthf
+#define glDeleteVertexArrays		glDeleteVertexArraysOES
+#define glGenVertexArrays			glGenVertexArraysOES
+#define glBindVertexArray			glBindVertexArrayOES
+#define glMapBuffer					glMapBufferOES
+#define glUnmapBuffer				glUnmapBufferOES
+
+#define GL_DEPTH24_STENCIL8			GL_DEPTH24_STENCIL8_OES
+#define GL_WRITE_ONLY				GL_WRITE_ONLY_OES
+
+// Android
+#elif __CC_PLATFORM_ANDROID
 #define	glClearDepth				glClearDepthf
 #define glDeleteVertexArrays		glDeleteVertexArraysOES
 #define glGenVertexArrays			glGenVertexArraysOES

@@ -32,7 +32,7 @@
 
 #import <Foundation/Foundation.h> //	for NSObject
 
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 
 #define CCRectFromString(__r__)		CGRectFromString(__r__)
 #define CCPointFromString(__p__)	CGPointFromString(__p__)
@@ -40,7 +40,6 @@
 #define CCNSSizeToCGSize
 #define CCNSRectToCGRect
 #define CCNSPointToCGPoint
-
 
 #elif defined(__CC_PLATFORM_MAC)
 

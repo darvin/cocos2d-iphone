@@ -265,7 +265,7 @@
 				NSAssert( deflated != NULL, @"CCParticleSystem: error ungzipping textureImageData");
 				NSData *data = [[NSData alloc] initWithBytes:deflated length:deflatedLen];
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 				UIImage *image = [[UIImage alloc] initWithData:data];
 #elif defined(__CC_PLATFORM_MAC)
 				NSBitmapImageRep *image = [[NSBitmapImageRep alloc] initWithData:data];

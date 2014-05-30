@@ -9,7 +9,7 @@
 #ifdef __CC_PLATFORM_ANDROID
 
 BRIDGE_CLASS("org.cocos2d.CCGLView")
-@interface CCGLView : AndroidSurfaceView
+@interface CCGLView : SurfaceView
 
 - (id)initWithContext:(AndroidContext *)context;
 - (void)setupView;
