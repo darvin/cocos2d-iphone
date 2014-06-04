@@ -269,18 +269,22 @@ typedef NS_ENUM(NSInteger, CCTransitionFixedFunction)
 
 - (void)renderOutgoing:(float)progress
 {
+#if !defined(__CC_USE_GL_QUEUE)
     GLKVector4 c = _outgoingScene.colorRGBA.glkVector4;
     [_outgoingTexture beginWithClear:c.r g:c.g b:c.b a:c.a depth:1.0 stencil:0];
-	    [_outgoingScene visit];
+    [_outgoingScene visit];
     [_outgoingTexture end];
+#endif
 }
 
 - (void)renderIncoming:(float)progress
 {
+#if !defined(__CC_USE_GL_QUEUE)
     GLKVector4 c = _outgoingScene.colorRGBA.glkVector4;
     [_incomingTexture beginWithClear:c.r g:c.g b:c.b a:c.a depth:1.0 stencil:0];
 	    [_incomingScene visit];
     [_incomingTexture end];
+#endif
 }
 
 // -----------------------------------------------------------------
@@ -313,8 +317,10 @@ typedef NS_ENUM(NSInteger, CCTransitionFixedFunction)
 
 -(void)draw:(CCRenderer *)renderer transform:(const GLKMatrix4 *)transform
 {
+#if !defined(__CC_USE_GL_QUEUE)
 	typedef id (*Func)(id, SEL);
 	((Func)objc_msgSend)(self, _drawSelector);
+#endif
 }
 
 - (void)drawFixedFunction

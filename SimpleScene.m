@@ -9,6 +9,7 @@
 #import "SimpleScene.h"
 #import "CCNodeColor.h"
 #import "CCSprite.h"
+#import "CCLabelTTF.h"
 
 @implementation SimpleScene
 
@@ -37,7 +38,24 @@
     
     CCSprite* spr = [CCSprite spriteWithImageNamed:@"sample_hollow_circle.png"];
     spr.position = ccp(100, 0);
+    spr.anchorPoint = ccp(0.0, 0.0);
     [self addChild:spr];
+    
+    CCSprite* spr2 = [CCSprite spriteWithImageNamed:@"sample_hollow_circle.png"];
+    spr2.position = ccp(0, 90);
+    spr2.anchorPoint = ccp(0.0, 0.0);
+    [self addChild:spr2];
+
+    CCSprite* spr3 = [CCSprite spriteWithImageNamed:@"sample_square.png"];
+    spr3.position = ccp(70, 90);
+    spr3.anchorPoint = ccp(0.0, 0.0);
+    [self addChild:spr3];
+    
+    CCLabelTTF *label1 = [CCLabelTTF labelWithString:@"Label" fontName:@"Helvetica" fontSize:10.0];
+	label1.positionType = CCPositionTypeNormalized;
+	label1.position = ccp(0.5, 0.5);
+	[self addChild:label1];
+
 }
 
 @end

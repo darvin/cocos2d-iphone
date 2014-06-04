@@ -127,6 +127,17 @@ static void perform(void *info) {
     OSSpinLockUnlock(&_operationLock);
 }
 
+- (void)executeOperation:(void (^)(EAGLContext *))block {
+    if(CFRunLoopGetCurrent() == _runLoop) {
+        block(_ctx);
+    } else {
+        OSSpinLockLock(&_operationLock);
+        [_operations addObject:block];
+        OSSpinLockUnlock(&_operationLock);
+    }
+        
+}
+
 - (void)flush {
     if (CFRunLoopGetCurrent() == _runLoop) {
         [self drain];

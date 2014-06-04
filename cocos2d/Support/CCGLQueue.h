@@ -12,9 +12,16 @@
 @interface CCGLQueue : NSThread
 
 + (instancetype)mainQueueWithAPI:(EAGLRenderingAPI)api;
+
 + (instancetype)queueWithAPI:(EAGLRenderingAPI)api;
+
 - (instancetype)initWithAPI:(EAGLRenderingAPI)api;
+
 - (void)addOperation:(void (^)(EAGLContext *))block;
+
+// If we are already on the corrent thread, then just execute operation, otherwise add the operation to our queue
+- (void)executeOperation:(void (^)(EAGLContext *))block;
+
 - (void)flush;
 
 @end

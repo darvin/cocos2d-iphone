@@ -22,6 +22,10 @@
  * THE SOFTWARE.
  */
 
+#ifndef USE_SIMPLE_TEST
+#define USE_SIMPLE_TEST 0 // Note: this is temporary - while testing out cocos2d with CCGLQueue
+#endif
+
 #import "cocos2d.h"
 
 #import "AppDelegate.h"
@@ -76,7 +80,7 @@
 	if(testName){
 		return [TestBase sceneWithTestName:[NSString stringWithCString:testName encoding:NSUTF8StringEncoding]];
 	} else {
-#if __CC_USE_GL_QUEUE
+#if USE_SIMPLE_TEST
         return _simpleScene;
 #else
 		return [MainMenu scene];

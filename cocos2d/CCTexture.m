@@ -187,7 +187,8 @@ static CCTexture *CCTextureNone = nil;
 	if((self = [super init])) {
         
 #if __CC_USE_GL_QUEUE
-        [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] addOperation:^(EAGLContext *ctx) {
+        
+        [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] executeOperation:^(EAGLContext *ctx) {
 
 		glPushGroupMarkerEXT(0, "CCTexture: Init");
 		
@@ -298,7 +299,7 @@ static CCTexture *CCTextureNone = nil;
 
 		_contentScale = contentScale;
 		
-#if __CC_USE_GL_QUEUE
+#if 0
         [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] addOperation:^(EAGLContext *ctx) {
             glPopGroupMarkerEXT();
         }];
@@ -614,7 +615,14 @@ static CCTexture *CCTextureNone = nil;
 	_premultipliedAlpha = (info == kCGImageAlphaPremultipliedLast || info == kCGImageAlphaPremultipliedFirst);
 
 	CGContextRelease(context);
-	[self releaseData:data];
+    
+#if __CC_USE_GL_QUEUE
+    [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] addOperation:^(EAGLContext *ctx) {
+        [self releaseData:data];
+    }];
+#else
+    [self releaseData:data];
+#endif
 	
 	return self;
 }

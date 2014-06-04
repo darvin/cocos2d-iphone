@@ -87,7 +87,7 @@
             CC_CHECK_GL_ERROR_DEBUG();
         }];
         
-        [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] flush];
+        //[[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] flush];
         
 #else
 		if( ! sharegroup )
