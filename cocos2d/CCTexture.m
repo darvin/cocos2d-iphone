@@ -80,6 +80,8 @@
 #import "CCShader.h"
 #import "CCDirector.h"
 
+#import "CCGLQueue.h"
+
 #import "Support/ccUtils.h"
 #import "Support/CCFileUtils.h"
 
@@ -183,6 +185,10 @@ static CCTexture *CCTextureNone = nil;
 - (id) initWithData:(const void*)data pixelFormat:(CCTexturePixelFormat)pixelFormat pixelsWide:(NSUInteger)width pixelsHigh:(NSUInteger)height contentSizeInPixels:(CGSize)sizeInPixels contentScale:(CGFloat)contentScale
 {
 	if((self = [super init])) {
+        
+#if __CC_USE_GL_QUEUE
+        [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] addOperation:^(EAGLContext *ctx) {
+
 		glPushGroupMarkerEXT(0, "CCTexture: Init");
 		
 		// XXX: 32 bits or POT textures uses UNPACK of 4 (is this correct ??? )
@@ -228,6 +234,54 @@ static CCTexture *CCTextureNone = nil;
 				[NSException raise:NSInternalInconsistencyException format:@""];
 
 		}
+        }];
+#else
+        glPushGroupMarkerEXT(0, "CCTexture: Init");
+		
+		// XXX: 32 bits or POT textures uses UNPACK of 4 (is this correct ??? )
+		if( pixelFormat == CCTexturePixelFormat_RGBA8888 || ( CCNextPOT(width)==width && CCNextPOT(height)==height) )
+			glPixelStorei(GL_UNPACK_ALIGNMENT,4);
+		else
+			glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+        
+		glGenTextures(1, &_name);
+		glBindTexture(GL_TEXTURE_2D, _name);
+		
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+        
+		// Specify OpenGL texture image
+        
+		switch(pixelFormat)
+		{
+			case CCTexturePixelFormat_RGBA8888:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei) width, (GLsizei) height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+				break;
+			case CCTexturePixelFormat_RGBA4444:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei) width, (GLsizei) height, 0, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, data);
+				break;
+			case CCTexturePixelFormat_RGB5A1:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei) width, (GLsizei) height, 0, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, data);
+				break;
+			case CCTexturePixelFormat_RGB565:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei) width, (GLsizei) height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
+				break;
+			case CCTexturePixelFormat_RGB888:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei) width, (GLsizei) height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+				break;
+			case CCTexturePixelFormat_AI88:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, (GLsizei) width, (GLsizei) height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, data);
+				break;
+			case CCTexturePixelFormat_A8:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, (GLsizei) width, (GLsizei) height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
+				break;
+			default:
+				[NSException raise:NSInternalInconsistencyException format:@""];
+                
+		}
+#endif
 
 		_sizeInPixels  = sizeInPixels;
 		_width = width;
@@ -244,6 +298,13 @@ static CCTexture *CCTextureNone = nil;
 
 		_contentScale = contentScale;
 		
+#if __CC_USE_GL_QUEUE
+        [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] addOperation:^(EAGLContext *ctx) {
+            glPopGroupMarkerEXT();
+        }];
+#else
+		glPopGroupMarkerEXT();
+#endif
 		glPopGroupMarkerEXT();
 	}
 	return self;

@@ -27,8 +27,11 @@
 #import "AppDelegate.h"
 #import "MainMenu.h"
 #import "TestBase.h"
+#import "SimpleScene.h"
 
-@implementation AppController
+@implementation AppController {
+    SimpleScene* _simpleScene;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -63,12 +66,21 @@
 
 - (CCScene*) startScene
 {
+    
+    if(_simpleScene == nil) {
+        _simpleScene = [[SimpleScene alloc] init];
+    }
+    
 	const char *testName = getenv("Test");
 	
 	if(testName){
 		return [TestBase sceneWithTestName:[NSString stringWithCString:testName encoding:NSUTF8StringEncoding]];
 	} else {
+#if __CC_USE_GL_QUEUE
+        return _simpleScene;
+#else
 		return [MainMenu scene];
+#endif
 	}
 }
 

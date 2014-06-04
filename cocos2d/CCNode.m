@@ -42,6 +42,7 @@
 #import "CCTexture_Private.h"
 #import "CCActionManager_Private.h"
 
+#import "CCGLQueue.h"
 
 #ifdef __CC_PLATFORM_IOS
 #import "Platforms/iOS/CCDirectorIOS.h"
@@ -922,8 +923,9 @@ RecursivelyIncrementPausedAncestors(CCNode *node, int increment)
 		[child visit:renderer parentTransform:&transform];
 		}
 
-	if(!drawn) [self draw:renderer transform:&transform];
-
+	if(!drawn) {
+        [self draw:renderer transform:&transform];
+    }
 	// reset for next frame
 	_orderOfArrival = 0;
 }

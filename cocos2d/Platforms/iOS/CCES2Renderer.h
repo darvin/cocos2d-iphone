@@ -81,6 +81,8 @@
 @property (nonatomic,readonly) EAGLContext* context;
 
 - (BOOL)resizeFromLayer:(CAEAGLLayer *)layer;
+- (void)resizeFromLayer:(CAEAGLLayer *)layer ctx:(EAGLContext *)ctx;
+
 @end
 
 #endif // __CC_PLATFORM_IOS

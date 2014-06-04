@@ -31,7 +31,7 @@
 #import "CCShader_private.h"
 #import "CCDirector_Private.h"
 #import "CCGL.h"
-
+#import "CCGLQueue.h"
 
 @interface CCShader()
 +(GLuint)createVAOforCCVertexBuffer:(GLuint)vbo elementBuffer:(GLuint)ebo;
@@ -548,6 +548,27 @@ SortQueue(NSMutableArray *queue)
 -(instancetype)init
 {
 	if((self = [super init])){
+        
+#if __CC_USE_GL_QUEUE
+        [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] addOperation:^(EAGLContext *ctx) {
+            glPushGroupMarkerEXT(0, "CCRenderer: Init");
+            
+            glGenBuffers(1, &_vbo);
+            glGenBuffers(1, &_ebo);
+            
+            _vao = [CCShader createVAOforCCVertexBuffer:_vbo elementBuffer:_ebo];
+            
+            glPopGroupMarkerEXT();
+            
+            _queue = [NSMutableArray array];
+            
+            _vertexCapacity = 2*1024;
+            _vertexes = calloc(_vertexCapacity, sizeof(*_vertexes));
+            
+            _elementCapacity = 2*1024;
+            _elements = calloc(_elementCapacity, sizeof(*_elements));
+        }];
+#else
 		glPushGroupMarkerEXT(0, "CCRenderer: Init");
 		
 		glGenBuffers(1, &_vbo);
@@ -564,6 +585,8 @@ SortQueue(NSMutableArray *queue)
 		
 		_elementCapacity = 2*1024;
 		_elements = calloc(_elementCapacity, sizeof(*_elements));
+        
+#endif
 	}
 	
 	return self;
@@ -612,7 +635,7 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 
 -(void)bindVAO:(BOOL)bind
 {
-	if(bind != _vaoBound){
+ 	if(bind != _vaoBound){
 		glInsertEventMarkerEXT(0, "CCRenderer: Bind VAO");
 		glBindVertexArray(bind ? _vao : 0);
 		
@@ -681,6 +704,7 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	glPopGroupMarkerEXT();
 	
 	_renderState = renderState;
+    
 	return;
 }
 
@@ -772,8 +796,8 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 
 -(void)enqueueBlock:(void (^)())block globalSortOrder:(NSInteger)globalSortOrder debugLabel:(NSString *)debugLabel threadSafe:(BOOL)threadsafe
 {
-	[_queue addObject:[[CCRenderCommandCustom alloc] initWithBlock:block debugLabel:debugLabel globalSortOrder:globalSortOrder]];
-	_lastDrawCommand = nil;
+    [_queue addObject:[[CCRenderCommandCustom alloc] initWithBlock:block debugLabel:debugLabel globalSortOrder:globalSortOrder]];
+    _lastDrawCommand = nil;
 }
 
 -(void)enqueueMethod:(SEL)selector target:(id)target
@@ -841,7 +865,7 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	
 	glPopGroupMarkerEXT();
 	CC_CHECK_GL_ERROR_DEBUG();
-	
+    
 //	CC_INCREMENT_GL_DRAWS(1);
 }
 

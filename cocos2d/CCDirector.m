@@ -338,7 +338,8 @@ static CCDirector *_sharedDirector = nil;
 
 		// it could be nil
 		if( view ) {
-			[self createStatsLabel];
+            
+//			[self createStatsLabel]; // donotcheckin
 			[self setProjection: _projection];
 			
 			// TODO this should probably migrate somewhere else.

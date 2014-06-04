@@ -43,6 +43,7 @@
 #import "../../ccFPSImages.h"
 #import "../../CCConfiguration.h"
 #import "CCRenderer_private.h"
+#import "CCGLQueue.h"
 
 // support imports
 #import "../../Support/CGPointExtension.h"
@@ -103,13 +104,15 @@
 // Draw the Scene
 //
 - (void) drawScene
-{	
+{
     /* calculate "global" dt */
 	[self calculateDeltaTime];
 
 	CCGLView *openGLview = (CCGLView*)self.view;
+#if !__CC_USE_GL_QUEUE
 	[EAGLContext setCurrentContext:openGLview.context];
-
+#endif
+    
 	/* tick before glClear: issue #533 */
 	if( ! _isPaused ) [_scheduler update: _dt];
 
@@ -117,14 +120,39 @@
 	 XXX: Which bug is this one. It seems that it can't be reproduced with v0.9 */
 	if( _nextScene ) [self setNextScene];
 	
-	GLKMatrix4 projection = self.projectionMatrix;
+#if __CC_USE_GL_QUEUE
+    [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] addOperation:^(EAGLContext *ctx) {
+        GLKMatrix4 projection = self.projectionMatrix;
+        _renderer.globalShaderUniforms = [self updateGlobalShaderUniforms];
+        
+        [CCRenderer bindRenderer:_renderer];
+        [_renderer invalidateState];
+        
+        [_renderer enqueueClear:(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) color:_runningScene.colorRGBA.glkVector4 depth:1.0f stencil:0 globalSortOrder:NSIntegerMin];
+        
+        
+        // Render
+        [_runningScene visit:_renderer parentTransform:&projection];
+        [_notificationNode visit:_renderer parentTransform:&projection];
+        if( _displayStats ) [self showStats];
+        
+        [_renderer flush];
+        [CCRenderer bindRenderer:nil];
+        
+        [openGLview swapBuffers];        
+    }];
+#else
+    
+    GLKMatrix4 projection = self.projectionMatrix;
 	_renderer.globalShaderUniforms = [self updateGlobalShaderUniforms];
 	
 	[CCRenderer bindRenderer:_renderer];
 	[_renderer invalidateState];
 	
 	[_renderer enqueueClear:(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) color:_runningScene.colorRGBA.glkVector4 depth:1.0f stencil:0 globalSortOrder:NSIntegerMin];
-	
+
+
+    
 	// Render
 	[_runningScene visit:_renderer parentTransform:&projection];
 	[_notificationNode visit:_renderer parentTransform:&projection];
@@ -135,15 +163,29 @@
 	
 	[openGLview swapBuffers];
 
+#endif
 	_totalFrames++;
 
 	if( _displayStats ) [self calculateMPF];
+
+#if __CC_USE_GL_QUEUE
+    [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] flush];
+#endif
+
 }
 
 -(void) setViewport
 {
-	CGSize size = _winSizeInPixels;
-	glViewport(0, 0, size.width, size.height );
+    
+#if __CC_USE_GL_QUEUE
+    [[CCGLQueue mainQueueWithAPI:kEAGLRenderingAPIOpenGLES2] addOperation:^(EAGLContext *ctx) {
+        CGSize size = _winSizeInPixels;
+        glViewport(0, 0, size.width, size.height );
+    }];
+#else
+    CGSize size = _winSizeInPixels;
+    glViewport(0, 0, size.width, size.height );
+#endif
 }
 
 -(void) setProjection:(CCDirectorProjection)projection
@@ -178,7 +220,10 @@
 	}
 
 	_projection = projection;
+
+#if !__CC_USE_GL_QUEUE
 	[self createStatsLabel];
+#endif
 }
 
 // override default logic
