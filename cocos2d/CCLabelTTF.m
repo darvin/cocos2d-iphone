@@ -40,6 +40,9 @@
 
 #ifdef __CC_PLATFORM_IOS
 #import "Platforms/iOS/CCDirectorIOS.h"
+#endif
+
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 #import <CoreText/CoreText.h>
 #endif
 
@@ -358,7 +361,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     if (_shadowColor.alpha > 0) useFullColor = YES;
     if (_outlineColor.alpha > 0 && _outlineWidth > 0) useFullColor = YES;
     
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
     
     // Font color
     if (![formattedAttributedString hasAttribute:NSForegroundColorAttributeName])
@@ -367,10 +370,13 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         {
             useFullColor = YES;
         }
-        
+
         UIColor* color = _fontColor.UIColor;
-        
         [formattedAttributedString addAttribute:NSForegroundColorAttributeName value:color range:fullRange];
+        
+        // Wtf.. crashes TODO: Android
+//        CGColorRef color = _fontColor.CGColor;
+//        [formattedAttributedString addAttribute:NSForegroundColorAttributeName value:(__bridge id)color range:fullRange];
     }
     else
     {
@@ -380,9 +386,12 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     // Font
     if (![formattedAttributedString hasAttribute:NSFontAttributeName])
     {
-        UIFont* font = [UIFont fontWithName:_fontName size:_fontSize];
-        if (!font) font = [UIFont fontWithName:@"Helvetica" size:_fontSize];
-        [formattedAttributedString addAttribute:NSFontAttributeName value:font range:fullRange];
+        CTFontRef font = CTFontCreateWithName((CFStringRef)_fontName, _fontSize, NULL);
+        
+        if (!font) font = CTFontCreateWithName((CFStringRef)@"Helvetica", _fontSize, NULL);
+        [formattedAttributedString addAttribute:NSFontAttributeName value:(__bridge id)font range:fullRange];
+
+        CFRelease(font);
     }
     
     // Shadow
@@ -512,7 +521,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     if (dimensions.height == 0)
     {
         // Get dimensions for string without dimensions of string with variable height
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
         dimensions = [attributedString boundingRectWithSize:dimensions options:NSStringDrawingUsesLineFragmentOrigin context:NULL].size;
 #elif defined(__CC_PLATFORM_MAC)
         dimensions = [attributedString boundingRectWithSize:NSSizeFromCGSize(dimensions) options:NSStringDrawingUsesLineFragmentOrigin].size;
@@ -539,7 +548,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
             if (fontSize)
             {
                 // This is a string that can be resized (it only uses one font and size)
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
                 CGSize wantedSize = [attributedString boundingRectWithSize:CGSizeZero options:NSStringDrawingUsesLineFragmentOrigin context:NULL].size;
 #elif defined(__CC_PLATFORM_MAC)
                 CGSize wantedSize = [attributedString boundingRectWithSize:CGSizeZero options:NSStringDrawingUsesLineFragmentOrigin].size;
@@ -570,7 +579,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         }
 
         // Handle vertical alignment
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
         CGSize actualSize = [attributedString boundingRectWithSize:CGSizeMake(wDrawArea, 0) options:NSStringDrawingUsesLineFragmentOrigin context:NULL].size;
 #elif defined(__CC_PLATFORM_MAC)
         CGSize actualSize = NSSizeToCGSize([attributedString boundingRectWithSize:NSMakeSize(wDrawArea, 0) options:NSStringDrawingUsesLineFragmentOrigin].size);
@@ -605,7 +614,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     
     // Render the label - different code for Mac / iOS
     
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
     yOffset = (POTSize.height - dimensions.height) + yOffset;
 	
 	CGRect drawArea = CGRectMake(xOffset, yOffset, wDrawArea, hDrawArea);
@@ -748,7 +757,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         self.shader = [CCShader positionTextureA8ColorShader];
     }
     
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
     free(data); // On Mac data is freed by NSBitmapImageRep
 #endif
     

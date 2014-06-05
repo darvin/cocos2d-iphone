@@ -155,6 +155,7 @@ static CCFileUtils *fileUtils = nil;
 		_filenameLookup = [[NSMutableDictionary alloc] initWithCapacity:10];
 								  
 		
+        // TODO: what would make sense for android?
 #ifdef __CC_PLATFORM_IOS
 		_suffixesDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
 						 @"-ipad", CCFileUtilsSuffixiPad,

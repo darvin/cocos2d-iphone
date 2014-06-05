@@ -77,7 +77,7 @@
 {
 #ifdef __CC_PLATFORM_MAC
 	NSValue *value = [NSValue valueWithPoint:NSPointFromCGPoint(controlPoint)];
-#elif defined(__CC_PLATFORM_IOS)
+#elif defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 	NSValue *value = [NSValue valueWithCGPoint:controlPoint];
 #endif
 	
@@ -88,7 +88,7 @@
 {
 #ifdef __CC_PLATFORM_MAC
 	NSValue *value = [NSValue valueWithPoint:NSPointFromCGPoint(controlPoint)];
-#elif defined(__CC_PLATFORM_IOS)
+#elif defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 	NSValue *value = [NSValue valueWithCGPoint:controlPoint];
 #endif
 	
@@ -104,7 +104,7 @@
 
 #ifdef __CC_PLATFORM_MAC
 	CGPoint point = NSPointToCGPoint([value pointValue]);
-#elif defined(__CC_PLATFORM_IOS)
+#elif defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 	CGPoint point = [value CGPointValue];
 #endif
 
@@ -115,7 +115,7 @@
 {
 #ifdef __CC_PLATFORM_MAC
 	NSValue *value = [NSValue valueWithPoint:NSPointFromCGPoint(controlPoint)];
-#elif defined(__CC_PLATFORM_IOS)
+#elif defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 	NSValue *value = [NSValue valueWithCGPoint:controlPoint];
 #endif
 

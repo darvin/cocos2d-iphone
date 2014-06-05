@@ -58,6 +58,7 @@
     [copy enumerateAttribute:NSFontAttributeName inRange:fullRange options:0 usingBlock:^(id value, NSRange range, BOOL* stop){
         if (value)
         {
+            // TODO: Android
 #ifdef __CC_PLATFORM_IOS
             UIFont* font = value;
             font = [UIFont fontWithName:font.fontName size:font.pointSize * scale];
@@ -95,7 +96,7 @@
     [self enumerateAttribute:NSFontAttributeName inRange:fullRange options:0 usingBlock:^(id value, NSRange range, BOOL* stop){
         if (value)
         {
-#ifdef __CC_PLATFORM_IOS
+#ifdef __CC_PLATFORM_IOS // TODO: Android
             UIFont* font = value;
 #elif defined(__CC_PLATFORM_MAC)
             NSFont* font = value;
@@ -118,14 +119,14 @@
 
 - (NSAttributedString*) copyWithNewFontSize:(float) size
 {
-#ifdef __CC_PLATFORM_IOS
+#ifdef __CC_PLATFORM_IOS // TODO: Android
     UIFont* font = [self attribute:NSFontAttributeName atIndex:0 effectiveRange:NULL];
 #elif defined(__CC_PLATFORM_MAC)
     NSFont* font = [self attribute:NSFontAttributeName atIndex:0 effectiveRange:NULL];
 #endif
     if (!font) return NULL;
 
-#ifdef __CC_PLATFORM_IOS
+#ifdef __CC_PLATFORM_IOS // TOOD: Android
     UIFont* newFont = [UIFont fontWithName:font.fontName size:size];
 #elif defined(__CC_PLATFORM_MAC)
     NSFont* newFont = [NSFont fontWithName:font.fontName size:size];

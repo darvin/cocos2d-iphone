@@ -40,7 +40,7 @@
  */
 
 #ifndef __CC_USE_GL_QUEUE
-#define __CC_USE_GL_QUEUE 0
+#define __CC_USE_GL_QUEUE 1
 #endif
 
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED

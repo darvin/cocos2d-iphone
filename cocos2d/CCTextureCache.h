@@ -27,7 +27,7 @@
 
 #import "ccMacros.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 #import <CoreGraphics/CGImage.h>
 #endif
 
