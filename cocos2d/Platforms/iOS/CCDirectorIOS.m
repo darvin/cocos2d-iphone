@@ -131,6 +131,7 @@
         [_renderer enqueueClear:(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) color:_runningScene.colorRGBA.glkVector4 depth:1.0f stencil:0 globalSortOrder:NSIntegerMin];
         
         
+        // TODO: visit needs to happen on the main thread.
         // Render
         [_runningScene visit:_renderer parentTransform:&projection];
         [_notificationNode visit:_renderer parentTransform:&projection];
