@@ -298,12 +298,16 @@ static CCTextureCache *sharedTextureCache;
 		if ( [lowerCase hasSuffix:@".pvr"] || [lowerCase hasSuffix:@".pvr.gz"] || [lowerCase hasSuffix:@".pvr.ccz"] )
 			tex = [self addPVRImage:path];
 
-#ifdef __CC_PLATFORM_IOS
+#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
 
 		else {
+            BOOL png = [lowerCase hasSuffix:@".png"];
+            CGDataProviderRef imgDataProvider = CGDataProviderCreateWithCFData((CFDataRef)[NSData dataWithContentsOfFile:fullpath]);
+            CGImageRef image = (png) ? CGImageCreateWithPNGDataProvider(imgDataProvider, NULL, true, kCGRenderingIntentDefault) : CGImageCreateWithJPEGDataProvider(imgDataProvider, NULL, true, kCGRenderingIntentDefault) ;
+            tex = [[CCTexture alloc] initWithCGImage:image contentScale:contentScale];
+            CGDataProviderRelease(imgDataProvider);
+            CGImageRelease(image);
             
-			UIImage *image = [[UIImage alloc] initWithContentsOfFile:fullpath];
-			tex = [[CCTexture alloc] initWithCGImage:image.CGImage contentScale:contentScale];
 			CCLOGINFO(@"Texture loaded: %@", path);
             
 			if( tex ){
