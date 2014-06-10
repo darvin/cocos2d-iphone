@@ -247,11 +247,11 @@ static CCUniformSetter
 SetVec2(NSString *name, GLint location)
 {
 	return ^(CCRenderer *renderer, NSValue *value){
-		value = value ?: [NSValue valueWithGLKVector2:GLKVector2Make(0.0f, 0.0f)];
+		value = value ?: [NSValue valueWithCCVector2:CCVector2Make(0.0f, 0.0f)];
 		NSCAssert([value isKindOfClass:[NSValue class]], @"Shader uniform '%@' value must be wrapped in a NSValue.", name);
 		
-		if(strcmp(value.objCType, @encode(GLKVector2)) == 0){
-			GLKVector2 v; [value getValue:&v];
+		if(strcmp(value.objCType, @encode(CCVector2)) == 0){
+			CCVector2 v; [value getValue:&v];
 			glUniform2f(location, v.x, v.y);
 		} else if(strcmp(value.objCType, @encode(CGPoint)) == 0){
 			CGPoint v = {}; [value getValue:&v];
@@ -260,7 +260,7 @@ SetVec2(NSString *name, GLint location)
 			CGSize v = {}; [value getValue:&v];
 			glUniform2f(location, v.width, v.height);
 		} else {
-			NSCAssert(NO, @"Shader uniformm 'vec2 %@' value must be passed using [NSValue valueWithGLKVector2:], [NSValue valueWithCGPoint:], or [NSValue valueWithCGSize:]", name);
+			NSCAssert(NO, @"Shader uniformm 'vec2 %@' value must be passed using [NSValue valueWithCCVector2:], [NSValue valueWithCGPoint:], or [NSValue valueWithCGSize:]", name);
 		}
 	};
 }
@@ -269,11 +269,11 @@ static CCUniformSetter
 SetVec3(NSString *name, GLint location)
 {
 	return ^(CCRenderer *renderer, NSValue *value){
-		value = value ?: [NSValue valueWithGLKVector3:GLKVector3Make(0.0f, 0.0f, 0.0f)];
+		value = value ?: [NSValue valueWithCCVector3:CCVector3Make(0.0f, 0.0f, 0.0f)];
 		NSCAssert([value isKindOfClass:[NSValue class]], @"Shader uniform '%@' value must be wrapped in a NSValue.", name);
-		NSCAssert(strcmp(value.objCType, @encode(GLKVector3)) == 0, @"Shader uniformm 'vec3 %@' value must be passed using [NSValue valueWithGLKVector3:]", name);
+		NSCAssert(strcmp(value.objCType, @encode(CCVector3)) == 0, @"Shader uniformm 'vec3 %@' value must be passed using [NSValue valueWithCCVector3:]", name);
 		
-		GLKVector3 v; [value getValue:&v];
+		CCVector3 v; [value getValue:&v];
 		glUniform3f(location, v.x, v.y, v.z);
 	};
 }
@@ -282,18 +282,18 @@ static CCUniformSetter
 SetVec4(NSString *name, GLint location)
 {
 	return ^(CCRenderer *renderer, id value){
-		value = value ?: [NSValue valueWithGLKVector4:GLKVector4Make(0.0f, 0.0f, 0.0f, 1.0f)];
+		value = value ?: [NSValue valueWithCCVector4:CCVector4Make(0.0f, 0.0f, 0.0f, 1.0f)];
 		
 		if([value isKindOfClass:[NSValue class]]){
-			NSCAssert(strcmp([(NSValue *)value objCType], @encode(GLKVector4)) == 0, @"Shader uniformm 'vec4 %@' value must be passed using [NSValue valueWithGLKVector4:].", name);
+			NSCAssert(strcmp([(NSValue *)value objCType], @encode(CCVector4)) == 0, @"Shader uniformm 'vec4 %@' value must be passed using [NSValue valueWithCCVector4:].", name);
 			
-			GLKVector4 v; [value getValue:&v];
+			CCVector4 v; [value getValue:&v];
 			glUniform4f(location, v.x, v.y, v.z, v.w);
 		} else if([value isKindOfClass:[CCColor class]]){
-			GLKVector4 v = [(CCColor *)value glkVector4];
+			CCVector4 v = [(CCColor *)value CCVector4];
 			glUniform4f(location, v.x, v.y, v.z, v.w);
 		} else {
-			NSCAssert(NO, @"Shader uniformm 'vec4 %@' value must be passed using [NSValue valueWithGLKVector4:] or a CCColor object.", name);
+			NSCAssert(NO, @"Shader uniformm 'vec4 %@' value must be passed using [NSValue valueWithCCVector4:] or a CCColor object.", name);
 		}
 	};
 }
@@ -302,11 +302,11 @@ static CCUniformSetter
 SetMat4(NSString *name, GLint location)
 {
 	return ^(CCRenderer *renderer, NSValue *value){
-		value = value ?: [NSValue valueWithGLKMatrix4:GLKMatrix4Identity];
+		value = value ?: [NSValue valueWithCCMatrix4:CCMatrix4Identity];
 		NSCAssert([value isKindOfClass:[NSValue class]], @"Shader uniform '%@' value must be wrapped in a NSValue.", name);
-		NSCAssert(strcmp(value.objCType, @encode(GLKMatrix4)) == 0, @"Shader uniformm 'mat4 %@' value must be passed using [NSValue valueWithGLKMatrix4:]", name);
+		NSCAssert(strcmp(value.objCType, @encode(CCMatrix4)) == 0, @"Shader uniformm 'mat4 %@' value must be passed using [NSValue valueWithCCMatrix4:]", name);
 		
-		GLKMatrix4 m; [value getValue:&m];
+		CCMatrix4 m; [value getValue:&m];
 		glUniformMatrix4fv(location, 1, GL_FALSE, m.m);
 	};
 }

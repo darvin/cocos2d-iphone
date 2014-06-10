@@ -14,7 +14,7 @@
 
 -(id)init
 {
-    CCEffectUniform* u_blurDirection = [CCEffectUniform uniform:@"vec2" name:@"u_blurDirection" value:[NSValue valueWithGLKVector2:GLKVector2Make(0.0f, 0.0f)]];
+    CCEffectUniform* u_blurDirection = [CCEffectUniform uniform:@"vec2" name:@"u_blurDirection" value:[NSValue valueWithCCVector2:CCVector2Make(0.0f, 0.0f)]];
     CCEffectVarying* v_centerTextureCoordinate = [CCEffectVarying varying:@"vec2" name:@"v_centerTextureCoordinate"];
     CCEffectVarying* v_twoStepsLeftTextureCoordinate = [CCEffectVarying varying:@"vec2" name:@"v_twoStepsLeftTextureCoordinate"];
     CCEffectVarying* v_oneStepLeftTextureCoordinate = [CCEffectVarying varying:@"vec2" name:@"v_oneStepLeftTextureCoordinate"];
@@ -34,7 +34,7 @@
 }
 
 
--(id)initWithbBurStrength:(float)blurStrength direction:(GLKVector2)direction
+-(id)initWithbBurStrength:(float)blurStrength direction:(CCVector2)direction
 {
     if((self = [self init]))
     {
@@ -46,7 +46,7 @@
     return self;
 }
 
-+(id)effectWithBlurStrength:(float)blurStrength direction:(GLKVector2)direction
++(id)effectWithBlurStrength:(float)blurStrength direction:(CCVector2)direction
 {
     return [[self alloc] initWithbBurStrength:blurStrength direction:direction];
 }
@@ -104,23 +104,23 @@
     {
         if([self radialBlur])
         {
-            renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithGLKVector2:GLKVector2Make(_blurStrength, 0.0f)];
+            renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithCCVector2:CCVector2Make(_blurStrength, 0.0f)];
         }
         else
         {
-            GLKVector2 dir = [self calculateBlurDirection];
-            renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithGLKVector2:dir];
+            CCVector2 dir = [self calculateBlurDirection];
+            renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithCCVector2:dir];
         }
     }
     else if(renderPass.renderPassId == 1)
     {
-        renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithGLKVector2:GLKVector2Make(0.0f, _blurStrength)];
+        renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithCCVector2:CCVector2Make(0.0f, _blurStrength)];
     }
 }
 
 -(void)renderPassUpdate:(CCEffectRenderPass*)renderPass defaultBlock:(void (^)())defaultBlock
 {
-    GLKMatrix4 transform = renderPass.transform;
+    CCMatrix4 transform = renderPass.transform;
     [renderPass.sprite visit:renderPass.renderer parentTransform:&transform];
 }
 
@@ -128,9 +128,9 @@
 {
 }
 
--(GLKVector2)calculateBlurDirection
+-(CCVector2)calculateBlurDirection
 {
-    return GLKVector2Make(_blurDirection.x * _blurStrength, _blurDirection.y * _blurStrength);
+    return CCVector2Make(_blurDirection.x * _blurStrength, _blurDirection.y * _blurStrength);
 }
 
 -(BOOL)radialBlur

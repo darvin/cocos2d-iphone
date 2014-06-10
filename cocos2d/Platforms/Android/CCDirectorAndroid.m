@@ -61,13 +61,13 @@
 	 XXX: Which bug is this one. It seems that it can't be reproduced with v0.9 */
 	if( _nextScene ) [self setNextScene];
 	
-	GLKMatrix4 projection = self.projectionMatrix;
+	CCMatrix4 projection = self.projectionMatrix;
 	_renderer.globalShaderUniforms = [self updateGlobalShaderUniforms];
 	
 	[CCRenderer bindRenderer:_renderer];
 	[_renderer invalidateState];
 	
-	[_renderer enqueueClear:(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) color:_runningScene.colorRGBA.glkVector4 depth:1.0f stencil:0 globalSortOrder:NSIntegerMin];
+	[_renderer enqueueClear:(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) color:_runningScene.colorRGBA.CCVector4 depth:1.0f stencil:0 globalSortOrder:NSIntegerMin];
 	
 	// Render
 	[_runningScene visit:_renderer parentTransform:&projection];
@@ -98,14 +98,14 @@
     
 	switch (projection) {
 		case CCDirectorProjection2D:
-			_projectionMatrix = GLKMatrix4MakeOrtho(0, sizePoint.width, 0, sizePoint.height, -1024, 1024 );
+			_projectionMatrix = CCMatrix4MakeOrtho(0, sizePoint.width, 0, sizePoint.height, -1024, 1024 );
 			break;
             
 		case CCDirectorProjection3D: {
 			float zeye = sizePoint.height*sqrtf(3.0f)/2.0f;
-			_projectionMatrix = GLKMatrix4Multiply(
-                                                   GLKMatrix4MakePerspective(CC_DEGREES_TO_RADIANS(60), (float)sizePoint.width/sizePoint.height, 0.1f, zeye*2),
-                                                   GLKMatrix4MakeTranslation(-sizePoint.width/2.0, -sizePoint.height/2, -zeye)
+			_projectionMatrix = CCMatrix4Multiply(
+                                                   CCMatrix4MakePerspective(CC_DEGREES_TO_RADIANS(60), (float)sizePoint.width/sizePoint.height, 0.1f, zeye*2),
+                                                   CCMatrix4MakeTranslation(-sizePoint.width/2.0, -sizePoint.height/2, -zeye)
                                                    );
             
 			break;

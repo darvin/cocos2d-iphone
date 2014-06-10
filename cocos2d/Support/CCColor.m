@@ -290,9 +290,9 @@ static CCColor *CLEAR_COLOR = nil;
     return [[CCColor alloc] initWithCcColor4f:c];
 }
 
-+ (CCColor*) colorWithGLKVector4:(GLKVector4)c
++ (CCColor*) colorWithCCVector4:(CCVector4)c
 {
-    return [[CCColor alloc] initWithGLKVector4:c];
+    return [[CCColor alloc] initWithCCVector4:c];
 }
 
 - (CCColor*) initWithCcColor3b: (ccColor3B) c
@@ -310,7 +310,7 @@ static CCColor *CLEAR_COLOR = nil;
     return [self initWithRed:c.r green:c.g blue:c.b alpha:c.a];
 }
 
-- (CCColor*) initWithGLKVector4: (GLKVector4) c
+- (CCColor*) initWithCCVector4: (CCVector4) c
 {
     return [self initWithRed:c.r green:c.g blue:c.b alpha:c.a];
 }
@@ -330,9 +330,9 @@ static CCColor *CLEAR_COLOR = nil;
     return ccc4f(_r, _g, _b, _a);
 }
 
--(GLKVector4)glkVector4
+-(CCVector4)CCVector4
 {
-	return GLKVector4Make(_r, _g, _b, _a);
+	return CCVector4Make(_r, _g, _b, _a);
 }
 
 @end

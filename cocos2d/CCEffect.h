@@ -57,7 +57,7 @@
 @property (nonatomic) CCSprite* sprite;
 @property (nonatomic) NSMutableArray* textures; // indexed by renderPassId
 @property (nonatomic) CCRenderer* renderer;
-@property (nonatomic) GLKMatrix4 transform;
+@property (nonatomic) CCMatrix4 transform;
 
 @end
 

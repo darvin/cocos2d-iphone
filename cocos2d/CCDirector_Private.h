@@ -26,7 +26,7 @@
 
 @interface CCDirector () {
 	@protected
-	GLKMatrix4 _projectionMatrix;
+	CCMatrix4 _projectionMatrix;
 }
 
 /* Whether or not the replaced scene will receive the cleanup message.

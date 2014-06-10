@@ -34,7 +34,7 @@
     effectNode.positionType = CCPositionTypeNormalized;
     effectNode.position = ccp(0.1, 0.5);
     [effectNode addChild:sampleSprite];
-    CCEffectGaussianBlur* effect = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:GLKVector2Make(1.0, 0.0)];
+    CCEffectGaussianBlur* effect = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:CCVector2Make(1.0, 0.0)];
     [effectNode addEffect:effect];
     
     [self.contentNode addChild:effectNode];
@@ -49,7 +49,7 @@
     effectNode2.positionType = CCPositionTypeNormalized;
     effectNode2.position = ccp(0.21, 0.5);
     [effectNode2 addChild:sampleSprite2];
-    CCEffectGaussianBlur* effect2 = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:GLKVector2Make(0.0, 1.0)];
+    CCEffectGaussianBlur* effect2 = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:CCVector2Make(0.0, 1.0)];
     [effectNode2 addEffect:effect2];
     
     [self.contentNode addChild:effectNode2];
@@ -65,7 +65,7 @@
     effectNode3.position = ccp(0.5, 0.5);
     effectNode3.anchorPoint = ccp(0.5, 0.5);
     [effectNode3 addChild:sampleSprite3];
-    CCEffectGaussianBlur* effect3 = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:GLKVector2Make(1.0, 1.0)];
+    CCEffectGaussianBlur* effect3 = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:CCVector2Make(1.0, 1.0)];
     [effectNode3 addEffect:effect3];
     
     [self.contentNode addChild:effectNode3];
@@ -80,7 +80,7 @@
     effectNode4.positionType = CCPositionTypeNormalized;
     effectNode4.position = ccp(0.6, 0.5);
     [effectNode4 addChild:sampleSprite4];
-    CCEffectGaussianBlur* effect4 = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:GLKVector2Make(-1.0, 1.0)];
+    CCEffectGaussianBlur* effect4 = [CCEffectGaussianBlur effectWithBlurStrength:0.02f direction:CCVector2Make(-1.0, 1.0)];
     [effectNode4 addEffect:effect4];
     
     [self.contentNode addChild:effectNode4];

@@ -74,7 +74,6 @@
 		D3395F1A187F83E600F22C74 /* CCMemoryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D3395F19187F83E600F22C74 /* CCMemoryTests.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		D340E10E185660BE006E605C /* CCPhysicsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = D340E10C185660BE006E605C /* CCPhysicsTest.m */; };
 		D340E10F185660BE006E605C /* TilemapTest.m in Sources */ = {isa = PBXBuildFile; fileRef = D340E10D185660BE006E605C /* TilemapTest.m */; };
-		D34CD3C218ABEE9C00D8E537 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D34CD3C118ABEE9C00D8E537 /* GLKit.framework */; };
 		D34CD3C518ABF4AA00D8E537 /* CCRendererTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D34CD3C418ABF4AA00D8E537 /* CCRendererTests.m */; };
 		D3870C6018B440150033D885 /* SpritePerformanceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = D3870C5F18B440150033D885 /* SpritePerformanceTest.m */; };
 		D38C220718EB657100DD7599 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = D38C220618EB657100DD7599 /* Fonts */; };
@@ -225,7 +224,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D34CD3C218ABEE9C00D8E537 /* GLKit.framework in Frameworks */,
 				B7E2623617E7D589007067F0 /* libcocos2d.a in Frameworks */,
 				B7E2604C17E7D278007067F0 /* QuartzCore.framework in Frameworks */,
 				B7E2604E17E7D278007067F0 /* OpenGLES.framework in Frameworks */,

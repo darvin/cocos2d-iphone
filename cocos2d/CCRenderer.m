@@ -40,24 +40,24 @@
 //MARK: NSValue Additions.
 @implementation NSValue(CCRenderer)
 
-+(NSValue *)valueWithGLKVector2:(GLKVector2)vector
++(NSValue *)valueWithCCVector2:(CCVector2)vector
 {
-	return [NSValue valueWithBytes:&vector objCType:@encode(GLKVector2)];
+	return [NSValue valueWithBytes:&vector objCType:@encode(CCVector2)];
 }
 
-+(NSValue *)valueWithGLKVector3:(GLKVector3)vector
++(NSValue *)valueWithCCVector3:(CCVector3)vector
 {
-	return [NSValue valueWithBytes:&vector objCType:@encode(GLKVector3)];
+	return [NSValue valueWithBytes:&vector objCType:@encode(CCVector3)];
 }
 
-+(NSValue *)valueWithGLKVector4:(GLKVector4)vector
++(NSValue *)valueWithCCVector4:(CCVector4)vector
 {
-	return [NSValue valueWithBytes:&vector objCType:@encode(GLKVector4)];
+	return [NSValue valueWithBytes:&vector objCType:@encode(CCVector4)];
 }
 
-+(NSValue *)valueWithGLKMatrix4:(GLKMatrix4)matrix
++(NSValue *)valueWithCCMatrix4:(CCMatrix4)matrix
 {
-	return [NSValue valueWithBytes:&matrix objCType:@encode(GLKMatrix4)];
+	return [NSValue valueWithBytes:&matrix objCType:@encode(CCMatrix4)];
 }
 
 @end
@@ -708,7 +708,7 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	return;
 }
 
--(void)enqueueClear:(GLbitfield)mask color:(GLKVector4)color4 depth:(GLclampf)depth stencil:(GLint)stencil globalSortOrder:(NSInteger)globalSortOrder
+-(void)enqueueClear:(GLbitfield)mask color:(CCVector4)color4 depth:(GLclampf)depth stencil:(GLint)stencil globalSortOrder:(NSInteger)globalSortOrder
 {
 	[self enqueueBlock:^{
 		if(mask & GL_COLOR_BUFFER_BIT) glClearColor(color4.r, color4.g, color4.b, color4.a);

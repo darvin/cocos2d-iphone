@@ -49,8 +49,8 @@
 
 -(void)renderPassUpdate:(CCEffectRenderPass*)renderPass defaultBlock:(void (^)())defaultBlock
 {
-    GLKMatrix4 transform = renderPass.transform;
-    GLKVector4 clearColor;
+    CCMatrix4 transform = renderPass.transform;
+    CCVector4 clearColor;
     
     [renderPass.renderer enqueueClear:0 color:clearColor depth:0.0f stencil:0 globalSortOrder:NSIntegerMin];
     [renderPass.sprite visit:renderPass.renderer parentTransform:&transform];

@@ -17,7 +17,7 @@
 -(id)init
 {
     CCEffectUniform* u_enableGlowMap = [CCEffectUniform uniform:@"float" name:@"u_enableGlowMap" value:[NSNumber numberWithFloat:0.0f]];
-    CCEffectUniform* u_blurDirection = [CCEffectUniform uniform:@"vec2" name:@"u_blurDirection" value:[NSValue valueWithGLKVector2:GLKVector2Make(0.0f, 0.0f)]];
+    CCEffectUniform* u_blurDirection = [CCEffectUniform uniform:@"vec2" name:@"u_blurDirection" value:[NSValue valueWithCCVector2:CCVector2Make(0.0f, 0.0f)]];
     CCEffectVarying* v_centerTextureCoordinate = [CCEffectVarying varying:@"vec2" name:@"v_centerTextureCoordinate"];
     CCEffectVarying* v_twoStepsLeftTextureCoordinate = [CCEffectVarying varying:@"vec2" name:@"v_twoStepsLeftTextureCoordinate"];
     CCEffectVarying* v_oneStepLeftTextureCoordinate = [CCEffectVarying varying:@"vec2" name:@"v_oneStepLeftTextureCoordinate"];
@@ -120,12 +120,12 @@
     if(renderPass.renderPassId == 0)
     {
         renderPass.sprite.shaderUniforms[@"u_enableGlowMap"] = [NSNumber numberWithFloat:0.0f];
-        renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithGLKVector2:GLKVector2Make(_blurStrength, 0.0f)];
+        renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithCCVector2:CCVector2Make(_blurStrength, 0.0f)];
     }
     else if(renderPass.renderPassId == 1)
     {
         renderPass.sprite.shaderUniforms[@"u_enableGlowMap"] = [NSNumber numberWithFloat:0.0f];
-        renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithGLKVector2:GLKVector2Make(0.0f, _blurStrength)];
+        renderPass.sprite.shaderUniforms[@"u_blurDirection"] = [NSValue valueWithCCVector2:CCVector2Make(0.0f, _blurStrength)];
     }
     else if(renderPass.renderPassId == 2)
     {
@@ -135,7 +135,7 @@
 
 -(void)renderPassUpdate:(CCEffectRenderPass*)renderPass defaultBlock:(void (^)())defaultBlock
 {
-    GLKMatrix4 transform = renderPass.transform;
+    CCMatrix4 transform = renderPass.transform;
     [renderPass.sprite visit:renderPass.renderer parentTransform:&transform];
 }
 
