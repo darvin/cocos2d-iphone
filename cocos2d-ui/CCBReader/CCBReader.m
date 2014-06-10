@@ -279,9 +279,9 @@ static inline float readFloat(CCBReader *self)
 
         if (setProp)
         {
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
-            [node setValue:[NSValue valueWithCGPoint:ccp(x,y)] forKey:name];
-#elif defined (__CC_PLATFORM_MAC)
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
+            [node setValue:[CCValue valueWithCGPoint:ccp(x,y)] forKey:name];
+#elif __CC_PLATFORM_MAC
             [node setValue:[NSValue valueWithPoint:ccp(x,y)] forKey:name];
 #endif
             CCPositionType pType = CCPositionTypeMake(xUnit, yUnit, corner);
@@ -314,8 +314,8 @@ static inline float readFloat(CCBReader *self)
         if (setProp)
         {
             CGPoint pt = ccp(x,y);
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
-            [node setValue:[NSValue valueWithCGPoint:pt] forKey:name];
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
+            [node setValue:[CCValue valueWithCGPoint:pt] forKey:name];
 #else
             [node setValue:[NSValue valueWithPoint:NSPointFromCGPoint(pt)] forKey:name];
 #endif
@@ -335,9 +335,9 @@ static inline float readFloat(CCBReader *self)
         if (setProp)
         {
             CGSize size = CGSizeMake(w, h);
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
-            [node setValue:[NSValue valueWithCGSize:size] forKey:name];
-#elif defined (__CC_PLATFORM_MAC)
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
+            [node setValue:[CCValue valueWithCGSize:size] forKey:name];
+#elif __CC_PLATFORM_MAC
             [node setValue:[NSValue valueWithSize:size] forKey:name];
 #endif
             
@@ -1164,7 +1164,7 @@ static inline float readFloat(CCBReader *self)
     BOOL hasPhysicsBody = readBool(self);
     if (hasPhysicsBody)
     {
-//#ifdef __CC_PLATFORM_IOS
+//#if __CC_PLATFORM_IOS
 			// Read body shape
         int bodyShape = readIntWithSign(self, NO);
         float cornerRadius = readFloat(self);

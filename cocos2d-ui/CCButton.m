@@ -195,7 +195,7 @@
     
     [super layout];
 }
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 - (void) touchEntered:(UITouch *)touch withEvent:(UIEvent *)event
 {

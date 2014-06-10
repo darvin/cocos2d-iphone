@@ -44,7 +44,7 @@
 
 #import "CCGLQueue.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #import "Platforms/iOS/CCDirectorIOS.h"
 #elif __CC_PLATFORM_ANDROID
 #import "Platforms/Android/CCDirectorAndroid.h"

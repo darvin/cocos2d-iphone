@@ -101,7 +101,7 @@ static const ccPVRTexturePixelFormatInfo PVRTableFormats[] = {
 	// 8: LA_88
 	{GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 16, NO, YES, CCTexturePixelFormat_AI88},
 	
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 	// 9: PVRTC 2BPP RGB
 	{GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG, -1, -1, 2, YES, NO, CCTexturePixelFormat_PVRTC2},
 	// 10: PVRTC 2BPP RGBA
@@ -191,7 +191,7 @@ static struct _pixel_formathash v2_pixel_formathash[] = {
 	{ kPVR2TexturePixelFormat_I_8,			&PVRTableFormats[7] },
 	{ kPVR2TexturePixelFormat_AI_88,		&PVRTableFormats[8] },
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 	{ kPVR2TexturePixelFormat_PVRTC_2BPP_RGBA,	&PVRTableFormats[10] },
 	{ kPVR2TexturePixelFormat_PVRTC_4BPP_RGBA,	&PVRTableFormats[12] },
 #endif // iphone only
@@ -212,7 +212,7 @@ struct _pixel_formathash v3_pixel_formathash[] = {
 	{kPVR3TexturePixelFormat_L_8,		&PVRTableFormats[7] },
 	{kPVR3TexturePixelFormat_LA_88,		&PVRTableFormats[8] },
 	
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 	{kPVR3TexturePixelFormat_PVRTC_2BPP_RGB,	&PVRTableFormats[9] },
 	{kPVR3TexturePixelFormat_PVRTC_2BPP_RGBA,	&PVRTableFormats[10] },
 	{kPVR3TexturePixelFormat_PVRTC_4BPP_RGB,	&PVRTableFormats[11] },
@@ -604,7 +604,7 @@ typedef struct {
 			return nil;
 		}
 		
-#if defined(__CC_PLATFORM_IOS) && defined(DEBUG)
+#if __CC_PLATFORM_IOS && defined(DEBUG)
 
 		GLenum pixelFormat = _pixelFormatInfo->ccPixelFormat;
 		CCConfiguration *conf = [CCConfiguration sharedConfiguration];

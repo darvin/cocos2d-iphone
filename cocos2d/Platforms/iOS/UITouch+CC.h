@@ -26,7 +26,7 @@
 
 #import "ccMacros.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 #import "cocos2d.h"
 #import <UIKit/UIKit.h>

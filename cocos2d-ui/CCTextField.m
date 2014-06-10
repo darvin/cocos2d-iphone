@@ -58,7 +58,7 @@
     
     [self addChild:_background];
     
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     
     // Create UITextField and set it up
     _textField = [[UITextField alloc] initWithFrame:CGRectZero];
@@ -71,7 +71,7 @@
     // Set default font size
     [self setFontSize: 17];
     
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
     
     // Create NSTextField and set it up
     _textField = [[NSTextField alloc] initWithFrame: NSMakeRect(10, 10, 300, 40)];
@@ -94,7 +94,7 @@
 
 - (void) positionTextField
 {
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     CGPoint worldPos = [self convertToWorldSpace:CGPointZero];
     CGPoint viewPos = [[CCDirector sharedDirector] convertToUI:worldPos];
     viewPos.x += _padding;
@@ -113,7 +113,7 @@
     frame.size = size;
     
     _textField.frame = frame;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
     CGPoint worldPos = [self convertToWorldSpace:CGPointZero];
     CGPoint viewPos = [[CCDirector sharedDirector] convertToUI:worldPos];
     viewPos.x += _padding;
@@ -135,13 +135,17 @@
 
 - (void) addUITextView
 {
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     [[[CCDirector sharedDirector] view] addSubview:_textField];
+#endif
     [self positionTextField];
 }
 
 - (void) removeUITextView
 {
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     [_textField removeFromSuperview];
+#endif
 }
 
 - (void) onEnter
@@ -173,7 +177,9 @@
     }
     
     // hide the UITextField if node is invisible
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     _textField.hidden = !isVisible;
+#endif
     
     if (isVisible) [self positionTextField];
 }
@@ -188,10 +194,10 @@
     
     self.contentSize = [self convertContentSizeFromPoints: sizeInPoints type:self.contentSizeType];
     
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     UIFont *font = _textField.font;
     _textField.font = [font fontWithSize:self.fontSizeInPoints*_scaleMultiplier];
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
     NSFont* font = _textField.font;
     _textField.font = [NSFont fontWithName:font.fontName size:self.fontSizeInPoints];
 #endif
@@ -200,13 +206,15 @@
 }
 
 - (void) setEnabled:(BOOL)enabled {
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     _textField.enabled = enabled;
+#endif
     [super setEnabled:enabled];
 }
 
 #pragma mark Text Field Delegate Methods
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
 #if defined(APPORTABLE)
@@ -235,7 +243,7 @@
     return YES;
 }
 
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 - (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor
 {
@@ -249,7 +257,7 @@
 
 - (void)registerForKeyboardNotifications
 {
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWasShown:)
                                                  name:UIKeyboardDidShowNotification object:nil];
@@ -262,12 +270,12 @@
 
 - (void) unregisterForKeyboardNotifications
 {
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 #endif
 }
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 - (void)keyboardWasShown:(NSNotification*)notification
 {
     _keyboardIsShown = YES;
@@ -304,7 +312,7 @@
 
 #pragma mark Focusing on Text Field
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 - (void) focusOnTextField
 {
@@ -385,7 +393,7 @@
 
 #pragma mark Properties
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 - (void) setString:(NSString *)string
 {
@@ -397,7 +405,7 @@
     return _textField.text;
 }
 
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 - (void) setString:(NSString *)string
 {

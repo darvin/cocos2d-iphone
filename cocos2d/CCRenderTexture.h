@@ -31,7 +31,7 @@
 #import "CCSprite.h"
 #import "CCTexture.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #import <UIKit/UIKit.h>
 #endif // iPHone
 
@@ -241,7 +241,7 @@ typedef NS_ENUM(NSInteger, CCRenderTextureImageFormat)
  */
 -(BOOL)saveToFile:(NSString*)name format:(CCRenderTextureImageFormat)format;
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 /**
  *  Returns an autoreleased UIImage from the texture 

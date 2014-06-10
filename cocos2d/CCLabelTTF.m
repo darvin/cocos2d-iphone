@@ -38,11 +38,11 @@
 #import "CCNode_Private.h"
 #import "CCDirector.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #import "Platforms/iOS/CCDirectorIOS.h"
 #endif
 
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
 #import <CoreText/CoreText.h>
 #endif
 
@@ -343,7 +343,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     
     _isTextureDirty = NO;
     
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     // Handle fonts on iOS 5
     if ([CCConfiguration sharedConfiguration].OSVersion < CCSystemVersion_iOS_6_0)
     {
@@ -361,22 +361,27 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     if (_shadowColor.alpha > 0) useFullColor = YES;
     if (_outlineColor.alpha > 0 && _outlineWidth > 0) useFullColor = YES;
     
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
     
     // Font color
-    if (![formattedAttributedString hasAttribute:NSForegroundColorAttributeName])
+    
+    if (![formattedAttributedString hasAttribute:(NSString*)kCTForegroundColorAttributeName])
     {
         if (![_fontColor isEqualToColor:[CCColor whiteColor]])
         {
             useFullColor = YES;
         }
+        
 
+#if __CC_PLATFORM_ANDROID && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+        AndroidColor* color [AndroidColor colorWithCGColor:_fontColor.CGColor];
+        [formattedAttributedString addAttribute:NSForegroundColorAttributeName value:color range:fullRange];
+#endif
+        
+#if __CC_PLATFORM_IOS
         UIColor* color = _fontColor.UIColor;
         [formattedAttributedString addAttribute:NSForegroundColorAttributeName value:color range:fullRange];
-        
-        // Wtf.. crashes TODO: Android
-//        CGColorRef color = _fontColor.CGColor;
-//        [formattedAttributedString addAttribute:NSForegroundColorAttributeName value:(__bridge id)color range:fullRange];
+#endif
     }
     else
     {
@@ -384,21 +389,23 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     }
     
     // Font
-    if (![formattedAttributedString hasAttribute:NSFontAttributeName])
+    if (![formattedAttributedString hasAttribute:(NSString*)kCTFontAttributeName])
     {
         CTFontRef font = CTFontCreateWithName((CFStringRef)_fontName, _fontSize, NULL);
         
         if (!font) font = CTFontCreateWithName((CFStringRef)@"Helvetica", _fontSize, NULL);
-        [formattedAttributedString addAttribute:NSFontAttributeName value:(__bridge id)font range:fullRange];
+        [formattedAttributedString addAttribute:(NSString*)kCTFontAttributeName value:(__bridge id)font range:fullRange];
 
         CFRelease(font);
     }
     
+#if __CC__PLATFORM_IOS || __CC_PLATFORM_MAC
     // Shadow
     if ([formattedAttributedString hasAttribute:NSShadowAttributeName])
     {
         useFullColor = YES;
     }
+
     
     // Text alignment
     if (![formattedAttributedString hasAttribute:NSParagraphStyleAttributeName])
@@ -411,8 +418,9 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         
         [formattedAttributedString addAttribute:NSParagraphStyleAttributeName value:style range:fullRange];
     }
+#endif
     
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
     // Font color
     if (![formattedAttributedString hasAttribute:NSForegroundColorAttributeName])
     {
@@ -521,9 +529,9 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     if (dimensions.height == 0)
     {
         // Get dimensions for string without dimensions of string with variable height
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
+#if (__CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID) && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
         dimensions = [attributedString boundingRectWithSize:dimensions options:NSStringDrawingUsesLineFragmentOrigin context:NULL].size;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
         dimensions = [attributedString boundingRectWithSize:NSSizeFromCGSize(dimensions) options:NSStringDrawingUsesLineFragmentOrigin].size;
 #endif
         
@@ -548,10 +556,12 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
             if (fontSize)
             {
                 // This is a string that can be resized (it only uses one font and size)
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
+#if (__CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID) && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
                 CGSize wantedSize = [attributedString boundingRectWithSize:CGSizeZero options:NSStringDrawingUsesLineFragmentOrigin context:NULL].size;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
                 CGSize wantedSize = [attributedString boundingRectWithSize:CGSizeZero options:NSStringDrawingUsesLineFragmentOrigin].size;
+#else 
+                CGSize wantedSize = CGSizeZero;
 #endif
                 
                 CGFloat wScaleFactor = 1;
@@ -579,10 +589,12 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         }
 
         // Handle vertical alignment
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
+#if (__CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID) && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
         CGSize actualSize = [attributedString boundingRectWithSize:CGSizeMake(wDrawArea, 0) options:NSStringDrawingUsesLineFragmentOrigin context:NULL].size;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
         CGSize actualSize = NSSizeToCGSize([attributedString boundingRectWithSize:NSMakeSize(wDrawArea, 0) options:NSStringDrawingUsesLineFragmentOrigin].size);
+#else
+        CGSize actualSize = CGSizeZero;
 #endif
         if (_verticalAlignment == CCVerticalTextAlignmentBottom)
         {
@@ -614,7 +626,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     
     // Render the label - different code for Mac / iOS
     
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
     yOffset = (POTSize.height - dimensions.height) + yOffset;
 	
 	CGRect drawArea = CGRectMake(xOffset, yOffset, wDrawArea, hDrawArea);
@@ -634,28 +646,37 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     CGAffineTransform flipVertical = CGAffineTransformMake(1, 0, 0, -1, 0, POTSize.height * 2 - dimensions.height);
     CGContextConcatCTM(context, flipVertical);
     
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
 	UIGraphicsPushContext(context);
+#endif
     
     // Handle shadow
     if (hasShadow)
     {
-        UIColor* color = _shadowColor.UIColor;
-        
-        CGContextSetShadowWithColor(context, CGSizeMake(shadowOffset.x, shadowOffset.y), shadowBlurRadius, [color CGColor]);
+        CGContextSetShadowWithColor(context, CGSizeMake(shadowOffset.x, shadowOffset.y), shadowBlurRadius, _shadowColor.CGColor);
     }
     
     // Handle outline
     if (hasOutline)
     {
-        UIColor* color = _outlineColor.UIColor;
         
         CGContextSetTextDrawingMode(context, kCGTextFillStroke);
         CGContextSetLineWidth(context, outlineWidth * 2);
         CGContextSetLineJoin(context, kCGLineJoinRound);
 
         NSMutableAttributedString* outlineString = [attributedString mutableCopy];
-        [outlineString addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, outlineString.length)];
         
+#if __CC_PLATFORM_ANDROID && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+        AndroidColor* color [AndroidColor colorWithCGColor:_outlineColor.CGColor];
+#endif
+        
+#if !__CC_PLATFORM_ANDROID && __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+        UIColor* color = _outlineColor.UIColor;
+
+        [outlineString addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, outlineString.length)];
+#endif
+      
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
         [outlineString drawInRect:drawArea];
 
         // Don't draw shadow for main font
@@ -666,15 +687,18 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
             // Draw outline again because shadow overlap
             [outlineString drawInRect:drawArea];
         }
+#endif
         CGContextSetTextDrawingMode(context, kCGTextFill);
     }
     
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     [attributedString drawInRect:drawArea];
     
     UIGraphicsPopContext();
+#endif
     CGContextRelease(context);
     
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
     yOffset = (POTSize.height - hDrawArea) - yOffset;
 	
 	CGRect drawArea = CGRectMake(xOffset, yOffset, wDrawArea, hDrawArea);
@@ -757,7 +781,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         self.shader = [CCShader positionTextureA8ColorShader];
     }
     
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
     free(data); // On Mac data is freed by NSBitmapImageRep
 #endif
     
@@ -768,7 +792,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 #pragma mark -
 #pragma mark Render Font iOS 5
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 - (BOOL) updateTextureOld
 {
     NSString* string = [self string];
@@ -1014,7 +1038,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 #pragma mark -
 #pragma mark Handle HTML
 
-#ifdef __CC_PLATFORM_MAC
+#if __CC_PLATFORM_MAC
 - (void) setHTML:(NSString *)html
 {
     NSData* data = [html dataUsingEncoding:NSUTF8StringEncoding];

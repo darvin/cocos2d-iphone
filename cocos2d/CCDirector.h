@@ -59,11 +59,11 @@ typedef NS_ENUM(NSUInteger, CCDirectorProjection) {
 @class CCActionManager;
 @class CCTransition;
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #define CC_VIEWCONTROLLER UIViewController
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 #define CC_VIEWCONTROLLER NSObject
-#elif defined(__CC_PLATFORM_ANDROID)
+#elif __CC_PLATFORM_ANDROID
 #define CC_VIEWCONTROLLER NSObject
 #endif
 
@@ -391,7 +391,7 @@ and when to execute the Scenes.
 -(void) startAnimation;
 
 
-#if defined(__CC_PLATFORM_MAC)
+#if __CC_PLATFORM_MAC
 // XXX: Hack. Should be placed on CCDirectorMac.h. Refactoring needed
 // sets the openGL view
 -(void) setView:(CCGLView*)view;

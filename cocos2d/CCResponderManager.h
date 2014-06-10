@@ -32,7 +32,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if (TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR) && !__CC_PLATFORM_ANDROID
 
 #import <UIKit/UIKit.h>
 
@@ -62,7 +62,7 @@
 
 @end
 
-#else
+#elif __CC_PLATFORM_MAC
 
 #pragma mark - OSX Running Responder
 
@@ -103,6 +103,10 @@ typedef NS_ENUM(NSInteger, CCMouseButton)
 @property (nonatomic, assign) CCMouseButton button;
 
 @end
+
+#else
+
+#define RESPONDER NSObject
 
 #endif
 

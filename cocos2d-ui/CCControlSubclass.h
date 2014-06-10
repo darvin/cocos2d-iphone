@@ -70,7 +70,7 @@
  */
 - (id) valueForKey:(NSString *)key state:(CCControlState)state;
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 /**
  *  Used by sub-classes. Called when a touch enters the component. By default this happes if the touch down is within the control, if the claimsUserEvents property is set to false this will also happen if the touch starts outside of the control.
@@ -104,7 +104,7 @@
  */
 - (void) touchUpOutside:(UITouch*) touch withEvent:(UIEvent*) event;
 
-#elif defined (__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 /**
  *  Used by sub-classes. Called when a mouse down enters the component. By default this happes if the mouse down is within the control, if the claimsUserEvents property is set to false this will also happen if the mouse down starts outside of the control.

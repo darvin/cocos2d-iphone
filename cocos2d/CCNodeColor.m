@@ -37,9 +37,9 @@
 
 #import "CCGLQueue.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #import "Platforms/iOS/CCDirectorIOS.h"
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 #import "Platforms/Mac/CCDirectorMac.h"
 #endif
 

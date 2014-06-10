@@ -55,14 +55,14 @@
 #import "Support/CCProfiling.h"
 #import "Support/CCFileUtils.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #import "Platforms/iOS/CCDirectorIOS.h"
 #define CC_DIRECTOR_DEFAULT CCDirectorDisplayLink
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 #import "Platforms/Mac/CCDirectorMac.h"
 #define CC_DIRECTOR_DEFAULT CCDirectorDisplayLink
-#elif defined(__CC_PLATFORM_ANDROID)
-#import "Platforms/Mac/CCDirectorAndroid.h"
+#elif __CC_PLATFORM_ANDROID
+#import "Platforms/Android/CCDirectorAndroid.h"
 #define CC_DIRECTOR_DEFAULT CCDirectorDisplayLink
 #endif
 
@@ -318,15 +318,17 @@ static CCDirector *_sharedDirector = nil;
 
 	if( view != __view ) {
 	
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 		[super setView:view];
 #endif
 		__view = view;
 
 		// set size
 		CGSize size = CCNSSizeToCGSize(__view.bounds.size);
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 		CGFloat scale = __view.layer.contentsScale ?: 1.0;
+#elif __CC_PLATFORM_ANDROID && __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+        CGFloat scale = 1.0f;
 #else
 		//self.view.wantsBestResolutionOpenGLSurface = YES;
 		CGFloat scale = self.view.window.backingScaleFactor;

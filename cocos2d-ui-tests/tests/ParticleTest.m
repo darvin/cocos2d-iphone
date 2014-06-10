@@ -122,9 +122,9 @@
 }
 
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
 #define PARTICLE_FIRE_NAME @"fire.pvr"
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 #define PARTICLE_FIRE_NAME @"fire.png"
 #endif
 
@@ -291,7 +291,7 @@
   //	[self.emitter stopSystem];
 }
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 -(void) touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
@@ -311,7 +311,7 @@
 	_emitter.position = convertedLocation;
 }
 
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 - (void)mouseDown:(NSEvent *)theEvent
 {

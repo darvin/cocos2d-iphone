@@ -70,7 +70,7 @@
     _handle.position = ccp(size.width * _sliderValue, size.height/2.0f);
 }
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 #pragma mark Handle touches
 
@@ -101,7 +101,7 @@
 }
 
 
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 #pragma mark Handle mouse events
 

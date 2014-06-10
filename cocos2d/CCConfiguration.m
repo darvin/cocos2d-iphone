@@ -26,7 +26,7 @@
 
 #import "ccMacros.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #import <UIKit/UIKit.h>		// Needed for UIDevice
 #endif
 
@@ -72,8 +72,8 @@ static char * glExtensions;
 }
 
 
-#ifdef __CC_PLATFORM_IOS
-#elif defined(__CC_PLATFORM_MAC)
+#if __CC_PLATFORM_IOS
+#elif __CC_PLATFORM_MAC
 - (NSString*)getMacVersion
 {
     return([[NSProcessInfo processInfo] operatingSystemVersionString]);
@@ -86,10 +86,12 @@ static char * glExtensions;
 
 		// Obtain iOS version
 		_OSVersion = 0;
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 		NSString *OSVer = [[UIDevice currentDevice] systemVersion];
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 		NSString *OSVer = [self getMacVersion];
+#elif __CC_PLATFORM_ANDROID && __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+        NSString *OSVer = @"7.0.3";
 #endif
 		NSArray *arr = [OSVer componentsSeparatedByString:@"."];
 		int idx = 0x01000000;
@@ -131,7 +133,7 @@ static char * glExtensions;
 		} else
 			ret = CCDeviceiPhone;
 	}
-#elif defined(__CC_PLATFORM_IOS)
+#elif __CC_PLATFORM_IOS
 	
 	if( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 	{
@@ -148,7 +150,7 @@ static char * glExtensions;
 			ret = isiPhone5 ? CCDeviceiPhone5 : CCDeviceiPhone;
 	}
 	
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 	
 	// XXX: Add here support for Mac Retina Display
 	ret = CCDeviceMac;
@@ -170,21 +172,21 @@ static char * glExtensions;
 
 		NSAssert( glExtensions, @"OpenGL not initialized!");
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 		if( _OSVersion >= CCSystemVersion_iOS_4_0 )
 			glGetIntegerv(GL_MAX_SAMPLES_APPLE, &_maxSamplesAllowed);
 		else
 			_maxSamplesAllowed = 0;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 		glGetIntegerv(GL_MAX_SAMPLES, &_maxSamplesAllowed);
 #endif
 
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
 		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &_maxTextureUnits );
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 		_supportsNPOT = YES;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 		_supportsNPOT = [self checkForGLExtension:@"GL_ARB_texture_non_power_of_two"];
 #endif
 
@@ -192,11 +194,11 @@ static char * glExtensions;
 
 		// It seems that somewhere between firmware iOS 3.0 and 4.2 Apple renamed
 		// GL_IMG_... to GL_APPLE.... So we should check both names
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 		BOOL bgra8a = [self checkForGLExtension:@"GL_IMG_texture_format_BGRA8888"];
 		BOOL bgra8b = [self checkForGLExtension:@"GL_APPLE_texture_format_BGRA8888"];
 		_supportsBGRA8888 = bgra8a | bgra8b;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 		_supportsBGRA8888 = [self checkForGLExtension:@"GL_EXT_bgra"];
 #endif
 		_supportsDiscardFramebuffer = [self checkForGLExtension:@"GL_EXT_discard_framebuffer"];
@@ -270,13 +272,15 @@ static char * glExtensions;
 #if DEBUG
 	printf("cocos2d: %s\n", cocos2d_version );
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 	NSString *OSVer = [[UIDevice currentDevice] systemVersion];
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_ANDROID && __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+    NSString *OSVer = @"7.0.3";
+#else //__CC_PLATFORM_MAC
 	NSString *OSVer = [self getMacVersion];
 #endif
 
-#ifdef __CC_PLATFORM_MAC
+#if __CC_PLATFORM_MAC
 	printf("cocos2d: Director's thread: %s\n",
 #if (CC_DIRECTOR_MAC_THREAD == CC_MAC_USE_MAIN_THREAD)
 		  "Main thread"

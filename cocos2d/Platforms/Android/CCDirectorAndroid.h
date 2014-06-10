@@ -6,17 +6,11 @@
 //
 //
 
-#ifdef __CC_PLATFORM_ANDROID
+#if __CC_PLATFORM_ANDROID
 
 #import "../../CCDirector.h"
 
 @interface CCDirectorAndroid : CCDirector
-{
-	CADisplayLink	*_displayLink;
-	CFTimeInterval	_lastDisplayTime;
-}
-
--(void) mainLoop:(id)sender;
 
 @end
 

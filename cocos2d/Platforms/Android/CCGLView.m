@@ -5,7 +5,7 @@
 //  Created by Oleg Osin on 5/22/14.
 //
 //
-#ifdef __CC_PLATFORM_ANDROID
+#if __CC_PLATFORM_ANDROID
 #import "CCGLView.h"
 
 // Sample BridgeKit syntax

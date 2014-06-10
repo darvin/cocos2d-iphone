@@ -30,14 +30,14 @@
 #import "CCActionInstant.h"
 #import "CCResponderManager.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 // Includes for iOS
 #import "UITouch+CC.h"
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
 // Includes for Mac
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 #endif
 
@@ -60,7 +60,7 @@
 #pragma mark Helper classes
 
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 @interface CCTapDownGestureRecognizer : UIGestureRecognizer
 @end
 
@@ -165,7 +165,7 @@
 @implementation CCScrollView {
 	BOOL _decelerating;
 
-#ifdef __CC_PLATFORM_MAC
+#if __CC_PLATFORM_MAC
 	CGPoint _lastPosition;
 #endif
 }
@@ -196,7 +196,7 @@
     _verticalScrollEnabled = YES;
     _bounces = YES;
     
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     
     // Create gesture recognizers
     _panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
@@ -205,7 +205,7 @@
     _panRecognizer.delegate = self;
     _tapRecognizer.delegate = self;
     
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
     
     // Use scroll wheel
     self.userInteractionEnabled = YES;
@@ -391,7 +391,7 @@
     }
     else
     {
-#ifdef __CC_PLATFORM_MAC
+#if __CC_PLATFORM_MAC
 		_lastPosition = self.scrollPosition;
 #endif
         [_contentNode stopActionByTag:kCCScrollViewActionXTag];
@@ -461,12 +461,12 @@
 		[self scrollViewDidScroll];
 	} else {
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 		if ( _decelerating && !(_animatingX || _animatingY)) {
 			[self scrollViewDidEndDecelerating];
 			_decelerating = NO;
 		}
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 		if ( _decelerating && CGPointEqualToPoint(_lastPosition, self.scrollPosition)) {
 			[self scrollViewDidEndDecelerating];
 			_decelerating = NO;
@@ -552,7 +552,7 @@
 
 #pragma mark Gesture recognizer
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 - (void)handlePan:(UIGestureRecognizer *)gestureRecognizer
 {
@@ -759,7 +759,7 @@
     [super onExitTransitionDidStart];
 }
 
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 #define kCCScrollViewMinPagingDelta 7
 

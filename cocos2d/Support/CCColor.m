@@ -31,7 +31,7 @@
     return [[CCColor alloc] initWithCGColor:cgColor];
 }
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 + (CCColor*) colorWithUIColor:(UIColor *)color
 {
     return [[CCColor alloc] initWithUIColor:color];
@@ -140,7 +140,7 @@
     return self;
 }
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 - (CCColor*) initWithUIColor:(UIColor *)color
 {
     self = [super init];
@@ -180,7 +180,7 @@
     return color;
 }
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 - (UIColor*) UIColor
 {
@@ -189,7 +189,7 @@
 
 #endif
 
-#ifdef __CC_PLATFORM_MAC
+#if __CC_PLATFORM_MAC
 - (NSColor*) NSColor
 {
 	return [NSColor colorWithCalibratedRed:(CGFloat)_r green:(CGFloat)_g blue:(CGFloat)_b alpha:(CGFloat)_a];

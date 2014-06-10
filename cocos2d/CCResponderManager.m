@@ -148,7 +148,9 @@
 {
     while (_runningResponderList.count > 0)
     {
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
         [self cancelResponder:[_runningResponderList lastObject]];
+#endif
     }
     _exclusiveMode = NO;
 }
@@ -224,10 +226,11 @@
 #pragma mark - iOS touch handling -
 // -----------------------------------------------------------------
 
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-
+//#if (TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+#if (TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR) && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    
     if (!_enabled) return;
     if (_exclusiveMode) return;
     
@@ -471,7 +474,7 @@
 
 // -----------------------------------------------------------------
 
-#else
+#elif __CC_PLATFORM_MAC
 
 // -----------------------------------------------------------------
 #pragma mark - Mac mouse handling -

@@ -72,7 +72,7 @@
  */
 - (id)init;
 
-#if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
+#if (TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR) && !__CC_PLATFORM_ANDROID
 
 
 #pragma mark -
@@ -124,7 +124,7 @@
  */
 - (void)touchCancelled:(UITouch *)touch withEvent:(UIEvent *)event;
 
-#else
+#elif __CC__PLATFORM_MAC
 
 
 #pragma mark -

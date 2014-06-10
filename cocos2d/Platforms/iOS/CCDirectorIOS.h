@@ -29,7 +29,7 @@
 // But in case they are included, it won't be compiled.
 #import "../../ccMacros.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 #import "../../CCDirector.h"
 

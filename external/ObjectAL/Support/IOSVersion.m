@@ -6,7 +6,7 @@
 //
 
 #import "IOSVersion.h"
-#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && !__CC__PLATFORM_ANDROID
 #import <UIKit/UIKit.h>
 #endif
 

@@ -25,20 +25,22 @@
 #import "cocos2d.h"
 #import "CCControl.h"
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 /**
  The CCTextField is used for editing text by encapsulating a native text field (NSTextField on Mac and UITextField on iOS). An action callback will be sent when the text finishes editing or if the return key is pressed.
  
  @warning The native text field is only translated, no other transformations are applied. The text field may not be displayed correctly if rotated or scaled.
  */
 @interface CCTextField : CCControl <UITextFieldDelegate>
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 @interface CCTextField : CCControl <NSTextFieldDelegate>
+#else // __CC__PLATFORM_ANDROID
+@interface CCTextField : CCControl
 #endif
 {
     CCSprite9Slice* _background;
 		CGFloat _scaleMultiplier;
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     BOOL _keyboardIsShown;
     float _keyboardHeight;
 #endif
@@ -62,10 +64,10 @@
  */
 - (id) initWithSpriteFrame:(CCSpriteFrame*)frame;
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 /** iOS: UITextField used by the CCTextField. */
 @property (nonatomic,readonly) UITextField* textField;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 /** Mac: NSTextField used by the CCTextField. */
 @property (nonatomic,readonly) NSTextField* textField;

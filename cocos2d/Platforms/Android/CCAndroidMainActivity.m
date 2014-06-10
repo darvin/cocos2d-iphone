@@ -6,7 +6,7 @@
 //
 //
 
-#ifdef __CC_PLATFORM_ANDROID
+#if __CC_PLATFORM_ANDROID
 #import "CCAndroidMainActivity.h"
 #import "CCGLView.h"
 

@@ -48,6 +48,7 @@
     _lblNumTouches.string = [NSString stringWithFormat:@"Num touches: %d", (unsigned int)_currentTouches.count];
 }
 
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
 - (void) touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
     CGPoint touchLoc = [touch locationInNode:self];
@@ -79,6 +80,7 @@
 {
     [self touchEnded:touch withEvent:event];
 }
+#endif
 
 @end
 

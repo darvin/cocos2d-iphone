@@ -420,7 +420,7 @@ static CCTexture *CCTextureNone = nil;
 
 	info = CGImageGetAlphaInfo(cgImage);
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 	// Bug #886. It is present on iOS 4 only
 	unsigned int version = [conf OSVersion];
@@ -469,7 +469,7 @@ static CCTexture *CCTextureNone = nil;
 		textureHeight = CGImageGetHeight(cgImage);
 	}
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 	// iOS 5 BUG:
 	// If width is not word aligned, convert it to word aligned.

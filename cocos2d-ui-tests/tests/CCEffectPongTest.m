@@ -307,22 +307,26 @@ typedef enum { TEST_PONG_PLAYING, TESTS_PONG_GAMEOVER } TEST_PONG_STATE;
 
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     CGPoint location = [touch locationInNode:self];
     if(location.x < _designSize.width * 0.5f)
     {
         if([self canPaddleMoveTo:location.y])
             _playerPaddle.position = ccp(_playerPaddle.position.x, location.y);
     }
+#endif
 }
 
 - (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
 {
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     CGPoint location = [touch locationInNode:self];
     if(location.x < _designSize.width * 0.5f)
     {
         if([self canPaddleMoveTo:location.y])
             _playerPaddle.position = ccp(_playerPaddle.position.x, location.y);
     }
+#endif
 }
 
 - (void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event

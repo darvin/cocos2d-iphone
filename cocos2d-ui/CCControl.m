@@ -27,12 +27,12 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 // iOS headers
 #import "UITouch+CC.h"
 
-#elif defined (__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 // Mac headers
 #import "NSEvent+CC.h"
@@ -76,7 +76,7 @@
 
 #pragma mark Touch handling
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 
 - (void) touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
@@ -145,7 +145,7 @@
 - (void) touchUpOutside:(UITouch*) touch withEvent:(UIEvent*) event
 {}
 
-#elif defined (__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
 
 - (void) mouseDown:(NSEvent *)event
 {

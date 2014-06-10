@@ -233,7 +233,7 @@
 /// @name OS X
 /// -----------------------------------------------------------------------
 
-#ifdef __CC_PLATFORM_MAC
+#if __CC_PLATFORM_MAC
 /**
  *  (OS X) HTML Label
  *

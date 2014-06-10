@@ -52,17 +52,18 @@
     
     NSRange fullRange = NSMakeRange(0, copy.length);
     
-		CGFloat scale = [CCDirector sharedDirector].contentScaleFactor;
+    CGFloat scale = [CCDirector sharedDirector].contentScaleFactor;
 		
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     // Update font size
     [copy enumerateAttribute:NSFontAttributeName inRange:fullRange options:0 usingBlock:^(id value, NSRange range, BOOL* stop){
         if (value)
         {
             // TODO: Android
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
             UIFont* font = value;
             font = [UIFont fontWithName:font.fontName size:font.pointSize * scale];
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
             NSFont* font = value;
             font = [NSFont fontWithName:font.fontName size:font.pointSize * scale];
 #endif						
@@ -83,6 +84,7 @@
             [copy addAttribute:NSShadowAttributeName value:shadow range:range];
         }
     }];
+#endif
     
     return copy;
 }
@@ -93,12 +95,14 @@
     __block BOOL foundValue = NO;
     __block BOOL singleValue = YES;
     __block float fontSize = 0;
+    
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
     [self enumerateAttribute:NSFontAttributeName inRange:fullRange options:0 usingBlock:^(id value, NSRange range, BOOL* stop){
         if (value)
         {
-#ifdef __CC_PLATFORM_IOS // TODO: Android
+#if __CC_PLATFORM_IOS // TODO: Android
             UIFont* font = value;
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
             NSFont* font = value;
 #endif
             
@@ -114,27 +118,32 @@
     }];
     
     if (foundValue && singleValue) return fontSize;
+#endif
     return 0;
 }
 
 - (NSAttributedString*) copyWithNewFontSize:(float) size
 {
-#ifdef __CC_PLATFORM_IOS // TODO: Android
+#if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+#if __CC_PLATFORM_IOS // TODO: Android
     UIFont* font = [self attribute:NSFontAttributeName atIndex:0 effectiveRange:NULL];
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
     NSFont* font = [self attribute:NSFontAttributeName atIndex:0 effectiveRange:NULL];
 #endif
     if (!font) return NULL;
 
-#ifdef __CC_PLATFORM_IOS // TOOD: Android
+#if __CC_PLATFORM_IOS // TOOD: Android
     UIFont* newFont = [UIFont fontWithName:font.fontName size:size];
-#elif defined(__CC_PLATFORM_MAC)
+#elif __CC_PLATFORM_MAC
     NSFont* newFont = [NSFont fontWithName:font.fontName size:size];
 #endif
     NSMutableAttributedString* copy = [self mutableCopy];
     [copy addAttribute:NSFontAttributeName value:newFont range:NSMakeRange(0, copy.length)];
-    
+
     return copy;
+#endif
+    
+    return [self mutableCopy];
 }
 
 @end
