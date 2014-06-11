@@ -361,11 +361,10 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     if (_shadowColor.alpha > 0) useFullColor = YES;
     if (_outlineColor.alpha > 0 && _outlineWidth > 0) useFullColor = YES;
     
-#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
+#if __CC_PLATFORM_IOS //|| __CC_PLATFORM_ANDROID
     
     // Font color
-    
-    if (![formattedAttributedString hasAttribute:(NSString*)kCTForegroundColorAttributeName])
+    if (![formattedAttributedString hasAttribute:NSForegroundColorAttributeName])
     {
         if (![_fontColor isEqualToColor:[CCColor whiteColor]])
         {
@@ -373,10 +372,10 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         }
         
 
-#if __CC_PLATFORM_ANDROID && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
-        AndroidColor* color [AndroidColor colorWithCGColor:_fontColor.CGColor];
-        [formattedAttributedString addAttribute:NSForegroundColorAttributeName value:color range:fullRange];
-#endif
+//#if __CC_PLATFORM_ANDROID && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+//        AndroidColor* color [AndroidColor colorWithCGColor:_fontColor.CGColor];
+//        [formattedAttributedString addAttribute:NSForegroundColorAttributeName value:color range:fullRange];
+//#endif
         
 #if __CC_PLATFORM_IOS
         UIColor* color = _fontColor.UIColor;
@@ -666,11 +665,11 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 
         NSMutableAttributedString* outlineString = [attributedString mutableCopy];
         
-#if __CC_PLATFORM_ANDROID && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
-        AndroidColor* color [AndroidColor colorWithCGColor:_outlineColor.CGColor];
-#endif
+//#if __CC_PLATFORM_ANDROID && !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+//        AndroidColor* color [AndroidColor colorWithCGColor:_outlineColor.CGColor];
+//#endif
         
-#if !__CC_PLATFORM_ANDROID && __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+#if !__CC_PLATFORM_ANDROID
         UIColor* color = _outlineColor.UIColor;
 
         [outlineString addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, outlineString.length)];
