@@ -5,7 +5,7 @@
 //  Created by Philippe Hausler on 5/29/14.
 //  Copyright (c) 2014 Apportable. All rights reserved.
 //
-
+#if !__CC_PLATFORM_MAC
 #import "CCGLQueue.h"
 #import <libkern/OSAtomic.h>
 
@@ -148,3 +148,4 @@ static void perform(void *info) {
 }
 
 @end
+#endif

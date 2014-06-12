@@ -387,18 +387,18 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         useFullColor = YES;
     }
     
+    
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+    
     // Font
-    if (![formattedAttributedString hasAttribute:(NSString*)kCTFontAttributeName])
+    if (![formattedAttributedString hasAttribute:NSFontAttributeName])
     {
-        CTFontRef font = CTFontCreateWithName((CFStringRef)_fontName, _fontSize, NULL);
+        UIFont* font = [UIFont fontWithName:_fontName size:_fontSize];
+        if (!font) font = [UIFont fontWithName:@"Helvetica" size:_fontSize];
+            [formattedAttributedString addAttribute:NSFontAttributeName value:font range:fullRange];
         
-        if (!font) font = CTFontCreateWithName((CFStringRef)@"Helvetica", _fontSize, NULL);
-        [formattedAttributedString addAttribute:(NSString*)kCTFontAttributeName value:(__bridge id)font range:fullRange];
-
-        CFRelease(font);
     }
     
-#if __CC__PLATFORM_IOS || __CC_PLATFORM_MAC
     // Shadow
     if ([formattedAttributedString hasAttribute:NSShadowAttributeName])
     {

@@ -29,11 +29,11 @@
 #import "CCActionEase.h"
 #import "CCActionInstant.h"
 #import "CCResponderManager.h"
-
+#import "CCTouch.h"
 #if __CC_PLATFORM_IOS
 
 // Includes for iOS
-#import "UITouch+CC.h"
+//#import "PlatformTouch+CC.h"
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
 // Includes for Mac
@@ -66,7 +66,7 @@
 
 @implementation CCTapDownGestureRecognizer
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesBegan:(NSSet *)touches withEvent:(CCTouchEvent *)event
 {
     if (self.state == UIGestureRecognizerStatePossible)
     {
@@ -685,7 +685,7 @@
     return NO;
 }
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(CCTouch *)touch
 {
     if (!_contentNode) return NO;
     if (!self.visible) return NO;

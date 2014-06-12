@@ -79,6 +79,8 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 #import "../../CCConfiguration.h"
 #import "CCScene.h"
 #import "CCGLQueue.h"
+#import "CCTouch.h"
+#import "CCTouchEvent.h"
 
 #import "CCDirector_Private.h"
 
@@ -89,7 +91,9 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 - (unsigned int) convertPixelFormat:(NSString*) pixelFormat;
 @end
 
-@implementation CCGLView
+@implementation CCGLView {
+    CCTouchEvent* _touchEvent;
+}
 
 @synthesize surfaceSize=_size;
 @synthesize pixelFormat=_pixelformat, depthFormat=_depthFormat;
@@ -153,6 +157,8 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
         self.multipleTouchEnabled = YES;
 
 		CC_CHECK_GL_ERROR_DEBUG();
+        
+        _touchEvent = [[CCTouchEvent alloc] init];
 	}
 
 	return self;
@@ -410,26 +416,31 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    // dispatch touch to responder manager
-    [[CCDirector sharedDirector].responderManager touchesBegan:touches withEvent:event];
+    _touchEvent.timestamp = event.timestamp;
+    [_touchEvent updateTouchesBegan:touches];
+    [[CCDirector sharedDirector].responderManager touchesBegan:_touchEvent.currentTouches withEvent:_touchEvent];
+    
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    // dispatch touch to responder manager
-    [[CCDirector sharedDirector].responderManager touchesMoved:touches withEvent:event];
+    _touchEvent.timestamp = event.timestamp;
+    [_touchEvent updateTouchesMoved:touches];
+    [[CCDirector sharedDirector].responderManager touchesMoved:_touchEvent.currentTouches withEvent:_touchEvent];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    // dispatch touch to responder manager
-    [[CCDirector sharedDirector].responderManager touchesEnded:touches withEvent:event];
+    _touchEvent.timestamp = event.timestamp;
+    [_touchEvent updateTouchesEnded:touches];
+    [[CCDirector sharedDirector].responderManager touchesEnded:_touchEvent.currentTouches withEvent:_touchEvent];
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    // dispatch touch to responder manager
-    [[CCDirector sharedDirector].responderManager touchesCancelled:touches withEvent:event];
+    _touchEvent.timestamp = event.timestamp;
+    [_touchEvent updateTouchesCancelled:touches];
+    [[CCDirector sharedDirector].responderManager touchesCancelled:_touchEvent.currentTouches withEvent:_touchEvent];
 }
  
 @end

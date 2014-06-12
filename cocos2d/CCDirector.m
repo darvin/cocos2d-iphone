@@ -354,7 +354,7 @@ static CCDirector *_sharedDirector = nil;
 
 		CC_CHECK_GL_ERROR_DEBUG();
 	}
-}
+} 
 
 -(CCGLView*) view
 {

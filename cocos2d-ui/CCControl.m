@@ -26,11 +26,14 @@
 #import "CCControlSubclass.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
+#import "CCTouch.h"
+#import "CCTouchEvent.h"
 
 #if __CC_PLATFORM_IOS
 
 // iOS headers
-#import "UITouch+CC.h"
+//#import "PlatformTouch+CC.h"
+
 
 #elif __CC_PLATFORM_MAC
 
@@ -78,7 +81,7 @@
 
 #if __CC_PLATFORM_IOS
 
-- (void) touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     _tracking = YES;
     _touchInside = YES;
@@ -86,7 +89,7 @@
     [self touchEntered:touch withEvent:event];
 }
 
-- (void) touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     if ([self hitTestWithWorldPos:[touch locationInWorld]])
     {
@@ -106,7 +109,7 @@
     }
 }
 
-- (void) touchEnded:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchEnded:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     if (_touchInside)
     {
@@ -121,7 +124,7 @@
     _tracking = NO;
 }
 
-- (void) touchCancelled:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchCancelled:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     if (_touchInside)
     {
@@ -133,16 +136,16 @@
     _tracking = NO;
 }
 
-- (void) touchEntered:(UITouch*) touch withEvent:(UIEvent*)event
+- (void) touchEntered:(CCTouch*) touch withEvent:(CCTouchEvent*)event
 {}
 
-- (void) touchExited:(UITouch*) touch withEvent:(UIEvent*) event
+- (void) touchExited:(CCTouch*) touch withEvent:(CCTouchEvent*) event
 {}
 
-- (void) touchUpInside:(UITouch*) touch withEvent:(UIEvent*) event
+- (void) touchUpInside:(CCTouch*) touch withEvent:(CCTouchEvent*) event
 {}
 
-- (void) touchUpOutside:(UITouch*) touch withEvent:(UIEvent*) event
+- (void) touchUpOutside:(CCTouch*) touch withEvent:(CCTouchEvent*) event
 {}
 
 #elif __CC_PLATFORM_MAC

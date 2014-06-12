@@ -127,6 +127,125 @@
     eglSwapBuffers(_display, _surface);
 }
 
+#pragma mark CCGLView - Touch Delegate
+
+//- (void)touchesBegan:(NSSet *)touches withEvent:(CCTouchEvent *)event
+//{
+//    // dispatch touch to responder manager
+//    [[CCDirector sharedDirector].responderManager touchesBegan:touches withEvent:event];
+//}
+//
+//- (void)touchesMoved:(NSSet *)touches withEvent:(CCTouchEvent *)event
+//{
+//    // dispatch touch to responder manager
+//    [[CCDirector sharedDirector].responderManager touchesMoved:touches withEvent:event];
+//}
+//
+//- (void)touchesEnded:(NSSet *)touches withEvent:(CCTouchEvent *)event
+//{
+//    // dispatch touch to responder manager
+//    [[CCDirector sharedDirector].responderManager touchesEnded:touches withEvent:event];
+//}
+//
+//- (void)touchesCancelled:(NSSet *)touches withEvent:(CCTouchEvent *)event
+//{
+//    // dispatch touch to responder manager
+//    [[CCDirector sharedDirector].responderManager touchesCancelled:touches withEvent:event];
+//}
+
+
+- (void)onTouchEvent:(id/*MotionEvent*/)event
+{
+    
+}
+
+- (void)handleTouchEvent:(id)event
+{
+//    switch ([event getAction]) {
+//        case /*MotionEvent.ACTION_POINTER_DOWN*/:
+//        {
+//            int indexPointer = [event getPointerId];
+//            int idPointer = [event getPointerId:indexPointer];
+//            float xPointer = [event getX:indexPointer];
+//            float yPointer = [event getY:indexPointer];
+//            
+//        }
+//        break;
+//            
+//        default:
+//            break;
+//    }
+    
+    
+    /*
+     switch (event.getAction() & MotionEvent.ACTION_MASK) {
+     case MotionEvent.ACTION_POINTER_DOWN: {
+     final int indexPointer = event.getActionIndex();
+     final int idPointer = event.getPointerId(indexPointer);
+     final float xPointer = event.getX(indexPointer);
+     final float yPointer = event.getY(indexPointer);
+     nativeTouchesBegin(idPointer, xPointer, yPointer, event.getEventTime());
+     break;
+     }
+     case MotionEvent.ACTION_DOWN: {
+     // there are only one finger on the screen
+     final int idDown = event.getPointerId(0);
+     final float xDown = event.getX();
+     final float yDown = event.getY();
+     nativeTouchesBegin(idDown, xDown, yDown, event.getEventTime());
+     break;
+     }
+     case MotionEvent.ACTION_MOVE: {
+     final int pointerNumber = event.getPointerCount();
+     final int[] ids = new int[pointerNumber];
+     final float[] xs = new float[pointerNumber];
+     final float[] ys = new float[pointerNumber];
+     
+     for (int i = 0; i < pointerNumber; i++) {
+     ids[i] = event.getPointerId(i);
+     xs[i] = event.getX(i);
+     ys[i] = event.getY(i);
+     }
+     nativeTouchesMove(ids, xs, ys, event.getEventTime());
+     break;
+     }
+     case MotionEvent.ACTION_POINTER_UP: {
+     final int indexPointer = event.getActionIndex();
+     final int idPointer = event.getPointerId(indexPointer);
+     final float xPointer = event.getX(indexPointer);
+     final float yPointer = event.getY(indexPointer);
+     nativeTouchesEnd(idPointer, xPointer, yPointer, event.getEventTime());
+     break;
+     }
+     case MotionEvent.ACTION_UP: {
+     // there are only one finger on the screen
+     final int idUp = event.getPointerId(0);
+     final float xUp = event.getX();
+     final float yUp = event.getY();
+     nativeTouchesEnd(idUp, xUp, yUp, event.getEventTime());
+     break;
+     }
+     case MotionEvent.ACTION_CANCEL: {
+     final int pointerNumber = event.getPointerCount();
+     final int[] ids = new int[pointerNumber];
+     final float[] xs = new float[pointerNumber];
+     final float[] ys = new float[pointerNumber];
+     
+     for (int i = 0; i < pointerNumber; i++) {
+     ids[i] = event.getPointerId(i);
+     xs[i] = event.getX(i);
+     ys[i] = event.getY(i);
+     }
+     nativeTouchesCancel(ids, xs, ys, event.getEventTime());
+     break;
+     }
+     default: {
+     Log.d("MotionEvent", "Other:" + event.getAction());
+     }
+     }
+     */
+}
+
 @end
 #endif // __CC_PLATFORM_ANDROID
 

@@ -11,6 +11,9 @@
 #if __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
 
 @interface SurfaceView : NSObject
+
+- (void)onTouchEvent:(id/*MotionEvent*/)event;
+
 @end
 
 @interface AndroidContext : NSObject
@@ -34,6 +37,7 @@ BRIDGE_CLASS("org.cocos2d.CCGLView")
 - (id)initWithContext:(AndroidContext *)context;
 - (void)setupView;
 - (void)swapBuffers;
+- (void)onTouchEvent:(id/*MotionEvent*/)event;
 
 @property (nonatomic) CGFloat contentScaleFactor; // TODO
 @property (nonatomic) CGRect bounds;    // TODO

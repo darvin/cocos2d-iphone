@@ -49,7 +49,7 @@
 }
 
 #if !__CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
-- (void) touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     CGPoint touchLoc = [touch locationInNode:self];
     
@@ -61,7 +61,7 @@
     [_currentTouches setObject:sprite forKey:[NSValue valueWithPointer:(void*)touch]];
 }
 
-- (void) touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     CGPoint touchLoc = [touch locationInNode:self];
     
@@ -69,14 +69,14 @@
     sprite.position = touchLoc;
 }
 
-- (void) touchEnded:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchEnded:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     CCSprite* sprite = [_currentTouches objectForKey:[NSValue valueWithPointer:(void*)touch]];
     [self removeChild:sprite];
     [_currentTouches removeObjectForKey:[NSValue valueWithPointer:(void*)touch]];
 }
 
-- (void) touchCancelled:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchCancelled:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     [self touchEnded:touch withEvent:event];
 }

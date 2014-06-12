@@ -32,11 +32,15 @@
 
 #import <Foundation/Foundation.h>
 
+#import "CCTouch.h"
+#import "CCTouchEvent.h"
+
 #if (TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR) && !__CC_PLATFORM_ANDROID
 
 #import <UIKit/UIKit.h>
 
-#define RESPONDER UIResponder
+//#define RESPONDER UIResponder
+#define RESPONDER NSObject
 
 #pragma mark - iOS Running Responder
 
@@ -53,12 +57,12 @@
 /**
  *  Holds the current touch. Note that touches must not be retained.
  */
-@property (nonatomic, weak) UITouch *touch;
+@property (nonatomic/*, weak*/) CCTouch *touch;
 
 /**
  *  Holdes the current event. Note that events must not be retained.
  */
-@property (nonatomic, weak) UIEvent *event;
+@property (nonatomic, weak) CCTouchEvent *event;
 
 @end
 
@@ -104,7 +108,7 @@ typedef NS_ENUM(NSInteger, CCMouseButton)
 
 @end
 
-#else
+#else // __CC__PLATFORM_ANDROIDj
 
 #define RESPONDER NSObject
 
@@ -211,6 +215,18 @@ enum
  *  @return Returns an array of CCNodes at the given point. The top most responder will be the first entry.
  */
 - (NSArray *)nodesAtPoint:(CGPoint)pos;
+
+/// -----------------------------------------------------------------------
+/// @name CCResponderManager Touch methods
+/// -----------------------------------------------------------------------
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(CCTouchEvent *)event;
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(CCTouchEvent *)event;
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(CCTouchEvent *)event;
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(CCTouchEvent *)event;
 
 @end
 

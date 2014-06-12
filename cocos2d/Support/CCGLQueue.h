@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Apportable. All rights reserved.
 //
 
+#if !__CC_PLATFORM_MAC
 #import <Foundation/Foundation.h>
 #import <OpenGLES/EAGL.h>
 
@@ -25,3 +26,4 @@
 - (void)flush;
 
 @end
+#endif

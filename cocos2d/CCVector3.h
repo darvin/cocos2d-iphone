@@ -306,3 +306,4 @@ extern "C" {
 #endif
 
 #endif /* __CC_VECTOR_3_H */
+

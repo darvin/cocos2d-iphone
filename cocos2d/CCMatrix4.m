@@ -107,3 +107,5 @@ __inline__ CCMatrix4 CCMatrix4Invert(CCMatrix4 matrix, bool *isInvertible) {
     
     return inv;
 }
+
+

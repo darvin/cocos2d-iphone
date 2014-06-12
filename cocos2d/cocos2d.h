@@ -129,7 +129,7 @@
 #import "CCAppDelegate.h"
 #import "Platforms/iOS/CCGLView.h"
 #import "Platforms/iOS/CCDirectorIOS.h"
-#import "Platforms/iOS/UITouch+CC.h"
+//#import "Platforms/iOS/PlatformTouch+CC.h"
 
 #elif __CC_PLATFORM_MAC
 #import "Platforms/Mac/CCGLView.h"

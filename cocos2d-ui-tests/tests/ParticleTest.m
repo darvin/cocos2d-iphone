@@ -293,17 +293,17 @@
 
 #if __CC_PLATFORM_IOS
 
--(void) touchBegan:(UITouch *)touch withEvent:(UIEvent *)event
+-(void) touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
 	[self touchEnded:touch withEvent:event];
 }
 
-- (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
+- (void)touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
 	[self touchEnded:touch withEvent:event];
 }
 
-- (void)touchEnded:(UITouch*)touch withEvent:(UIEvent *)event
+- (void)touchEnded:(CCTouch*)touch withEvent:(CCTouchEvent *)event
 {
 	CGPoint location = [touch locationInView: [touch view]];
 	CGPoint convertedLocation = [[CCDirector sharedDirector] convertToGL:location];

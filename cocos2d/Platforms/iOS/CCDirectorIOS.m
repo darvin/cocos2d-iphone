@@ -44,6 +44,7 @@
 #import "../../CCConfiguration.h"
 #import "CCRenderer_private.h"
 #import "CCGLQueue.h"
+#import "CCTouch.h"
 
 // support imports
 #import "../../Support/CGPointExtension.h"
@@ -253,7 +254,7 @@
 
 #pragma mark Director Point Convertion
 
--(CGPoint)convertTouchToGL:(UITouch*)touch
+-(CGPoint)convertTouchToGL:(CCTouch*)touch
 {
 	CGPoint uiPoint = [touch locationInView: [touch view]];
 	return [self convertToGL:uiPoint];

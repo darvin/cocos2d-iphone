@@ -36,8 +36,8 @@
 /** CCDirector extensions for iPhone
  */
 @interface CCDirector (iOSExtension)
-/** converts a UITouch to a GL point */
--(CGPoint)convertTouchToGL:(UITouch*)touch;
+/** converts a CCTouch to a GL point */
+-(CGPoint)convertTouchToGL:(CCTouch*)touch;
 @end
 
 #pragma mark -

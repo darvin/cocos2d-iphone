@@ -8,6 +8,7 @@
 
 #import "CCSlider.h"
 #import "CCControlSubclass.h"
+#import "CCTouch.h"
 
 @interface CCSlider (Inputs)
 - (void) inputEnteredWithWorlPos:(CGPoint)worldLocation;
@@ -74,24 +75,24 @@
 
 #pragma mark Handle touches
 
-- (void) touchEntered:(UITouch*)touch withEvent:(UIEvent*)event
+- (void) touchEntered:(CCTouch*)touch withEvent:(CCTouchEvent*)event
 {
     CGPoint worldLocation = [touch locationInWorld];
     
     [self inputEnteredWithWorlPos:worldLocation];
 }
 
-- (void) touchUpInside:(UITouch*)touch withEvent:(UIEvent*)event
+- (void) touchUpInside:(CCTouch*)touch withEvent:(CCTouchEvent*)event
 {
     [self inputUpInside];
 }
 
-- (void) touchUpOutside:(UITouch*)touch withEvent:(UIEvent*)event
+- (void) touchUpOutside:(CCTouch*)touch withEvent:(CCTouchEvent*)event
 {
     [self inputUpOutside];
 }
 
-- (void) touchMoved:(UITouch *)touch withEvent:(UIEvent *)event
+- (void) touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event
 {
     CGPoint dragPos = [touch locationInNode:self];
     

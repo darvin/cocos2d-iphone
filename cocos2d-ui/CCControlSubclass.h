@@ -78,7 +78,7 @@
  *  @param touch Touch that entered the component.
  *  @param event Event associated with the touch.
  */
-- (void) touchEntered:(UITouch*) touch withEvent:(UIEvent*)event;
+- (void) touchEntered:(CCTouch*) touch withEvent:(CCTouchEvent*)event;
 
 /**
  *  Used by sub-classes. Called when a touch exits the component.
@@ -86,7 +86,7 @@
  *  @param touch Touch that exited the component
  *  @param event Event associated with the touch.
  */
-- (void) touchExited:(UITouch*) touch withEvent:(UIEvent*) event;
+- (void) touchExited:(CCTouch*) touch withEvent:(CCTouchEvent*) event;
 
 /**
  *  Used by sub-classes. Called when a touch that started inside the component is ended inside the component. E.g. for CCButton, this triggers the buttons callback action.
@@ -94,7 +94,7 @@
  *  @param touch Touch that is released inside the component.
  *  @param event Event associated with the touch.
  */
-- (void) touchUpInside:(UITouch*) touch withEvent:(UIEvent*) event;
+- (void) touchUpInside:(CCTouch*) touch withEvent:(CCTouchEvent*) event;
 
 /**
  *  Used by sub-classes. Called when a touch that started inside the component is ended outside the component. E.g. for CCButton, this doesn't trigger any callback action.
@@ -102,7 +102,7 @@
  *  @param touch Touch that is release outside of the component.
  *  @param event Event associated with the touch.
  */
-- (void) touchUpOutside:(UITouch*) touch withEvent:(UIEvent*) event;
+- (void) touchUpOutside:(CCTouch*) touch withEvent:(CCTouchEvent*) event;
 
 #elif __CC_PLATFORM_MAC
 

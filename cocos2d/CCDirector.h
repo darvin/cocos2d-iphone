@@ -391,7 +391,7 @@ and when to execute the Scenes.
 -(void) startAnimation;
 
 
-#if __CC_PLATFORM_MAC
+#if __CC_PLATFORM_MAC || __CC_PLATFORM_ANDROID
 // XXX: Hack. Should be placed on CCDirectorMac.h. Refactoring needed
 // sets the openGL view
 -(void) setView:(CCGLView*)view;

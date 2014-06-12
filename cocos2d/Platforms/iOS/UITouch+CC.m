@@ -29,7 +29,7 @@
 
 #import "UITouch+CC.h"
 
-@implementation UITouch (CC)
+@implementation PlatformTouch (CC)
 
 - (CGPoint) locationInNode:(CCNode*) node
 {

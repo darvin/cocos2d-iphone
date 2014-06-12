@@ -96,7 +96,7 @@
  @param touch    Contains the touch.
  @param event    Current event information.
  */
-- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event;
+- (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event;
 
 /**
  *  Called whan a touch moves.
@@ -104,7 +104,7 @@
  *  @param touch    Contains the touch.
  *  @param event    Current event information.
  */
-- (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event;
+- (void)touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event;
 
 /**
  *  Called when a touch ends.
@@ -112,7 +112,7 @@
  *  @param touch    Contains the touch.
  *  @param event    Current event information.
  */
-- (void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event;
+- (void)touchEnded:(CCTouch *)touch withEvent:(CCTouchEvent *)event;
 
 /**
  *  Called when a touch was cancelled.
@@ -122,7 +122,7 @@
  *  @param touch    Contains the touch.
  *  @param event    Current event information.
  */
-- (void)touchCancelled:(UITouch *)touch withEvent:(UIEvent *)event;
+- (void)touchCancelled:(CCTouch *)touch withEvent:(CCTouchEvent *)event;
 
 #elif __CC__PLATFORM_MAC
 

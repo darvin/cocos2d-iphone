@@ -42,8 +42,6 @@
 #import "../../CCShader.h"
 #import "../../ccFPSImages.h"
  
-// external
-#import <CCit/CCMath.h>
 
 #import "CCDirector_Private.h"
 #import "CCRenderer_private.h"
