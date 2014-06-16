@@ -267,7 +267,7 @@
 
 #if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
                 BOOL png = [[[dictionary valueForKey:@"textureFileName"] lowercaseString] hasSuffix:@".png"];
-                CGDataProviderRef imgDataProvider = CGDataProviderCreateWithCFData((CFDataRef)data);
+                CGDataProviderRef imgDataProvider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
                 CGImageRef image = (png) ? CGImageCreateWithPNGDataProvider(imgDataProvider, NULL, true, kCGRenderingIntentDefault) : CGImageCreateWithJPEGDataProvider(imgDataProvider, NULL, true, kCGRenderingIntentDefault) ;
 				
 				[self setTexture:  [ [CCTextureCache sharedTextureCache] addCGImage:image forKey:textureName]];

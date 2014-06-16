@@ -52,6 +52,8 @@
 #endif
 
 #ifndef __CC_PLATFORM_ANDROID
+//#define __CC_PLATFORM_MAC 0
+//#define __CC_PLATFORM_IOS 0
 #define __CC_PLATFORM_ANDROID 0
 #define __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ 0
 #endif

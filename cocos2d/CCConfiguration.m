@@ -120,7 +120,8 @@ static char * glExtensions;
 -(NSInteger) runningDevice
 {
 	NSInteger ret=-1;
-	
+
+	/*
 #if defined(APPORTABLE)
     if( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 	{
@@ -133,7 +134,7 @@ static char * glExtensions;
 		} else
 			ret = CCDeviceiPhone;
 	}
-#elif __CC_PLATFORM_IOS
+#el*/#if __CC_PLATFORM_IOS
 	
 	if( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 	{

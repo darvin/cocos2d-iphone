@@ -307,7 +307,7 @@ static CCTextureCache *sharedTextureCache;
 
 		else {
             BOOL png = [lowerCase hasSuffix:@".png"];
-            CGDataProviderRef imgDataProvider = CGDataProviderCreateWithCFData((CFDataRef)[NSData dataWithContentsOfFile:fullpath]);
+            CGDataProviderRef imgDataProvider = CGDataProviderCreateWithCFData((__bridge CFDataRef)[NSData dataWithContentsOfFile:fullpath]);
             CGImageRef image = (png) ? CGImageCreateWithPNGDataProvider(imgDataProvider, NULL, true, kCGRenderingIntentDefault) : CGImageCreateWithJPEGDataProvider(imgDataProvider, NULL, true, kCGRenderingIntentDefault) ;
             tex = [[CCTexture alloc] initWithCGImage:image contentScale:contentScale];
             CGDataProviderRelease(imgDataProvider);
