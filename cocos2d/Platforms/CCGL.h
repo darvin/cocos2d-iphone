@@ -43,9 +43,8 @@
 #import "Mac/CCGLView.h"
 
 #elif __CC_PLATFORM_ANDROID
-#import <OpenGLES/ES2/gl.h>
-#import <OpenGLES/ES2/glext.h>
-#import <OpenGLES/EAGL.h>
+#include <EGL/egl.h> // requires ndk r5 or newer
+#include <GLES/gl.h>
 #import "Android/CCGLView.h"
 #endif
 
@@ -59,7 +58,9 @@ static inline void __CC_CHECK_GL_ERROR_DEBUG(const char *function, int line)
 			case GL_INVALID_ENUM: printf("OpenGL error GL_INVALID_ENUM detected at %s %d\n", function, line); break;
 			case GL_INVALID_VALUE: printf("OpenGL error GL_INVALID_VALUE detected at %s %d\n", function, line); break;
 			case GL_INVALID_OPERATION: printf("OpenGL error GL_INVALID_OPERATION detected at %s %d\n", function, line); break;
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 			case GL_INVALID_FRAMEBUFFER_OPERATION: printf("OpenGL error GL_INVALID_FRAMEBUFFER_OPERATION detected at %s %d\n", function, line); break;
+#endif
 			default: printf("OpenGL error 0x%04X detected at %s %d\n", error, function, line);
 		}
 	}

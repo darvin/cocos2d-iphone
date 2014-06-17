@@ -396,13 +396,16 @@ CCRenderState *CCRENDERSTATE_DEBUGCOLOR = nil;
 
 -(void)invokeOnRenderer:(CCRenderer *)renderer
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCRendererCommandDraw: Invoke");
-	
+#endif
 	[renderer setRenderState:_renderState];
 	glDrawElements(_mode, _elements, GL_UNSIGNED_SHORT, (GLvoid *)(_first*sizeof(GLushort)));
 	CC_INCREMENT_GL_DRAWS(1);
-	
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 }
 
 @end
@@ -440,12 +443,15 @@ CCRenderState *CCRENDERSTATE_DEBUGCOLOR = nil;
 
 -(void)invokeOnRenderer:(CCRenderer *)renderer
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, _debugLabel.UTF8String);
-	
+#endif
 	[renderer bindVAO:NO];
 	_block();
 	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 }
 
 @end
@@ -493,9 +499,14 @@ SortQueue(NSMutableArray *queue)
 {
 	SortQueue(_queue);
 	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, _debugLabel.UTF8String);
+#endif
 	for(id<CCRenderCommand> command in _queue) [command invokeOnRenderer:renderer];
+    
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 }
 
 -(NSInteger)globalSortOrder
@@ -569,14 +580,17 @@ SortQueue(NSMutableArray *queue)
             _elements = calloc(_elementCapacity, sizeof(*_elements));
         }];
 #else
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glPushGroupMarkerEXT(0, "CCRenderer: Init");
+#endif
 		
 		glGenBuffers(1, &_vbo);
 		glGenBuffers(1, &_ebo);
 		
 		_vao = [CCShader createVAOforCCVertexBuffer:_vbo elementBuffer:_ebo];
-		
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glPopGroupMarkerEXT();
+#endif
 		
 		_queue = [NSMutableArray array];
 		
@@ -594,13 +608,15 @@ SortQueue(NSMutableArray *queue)
 
 -(void)dealloc
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCRenderer: Dealloc");
-	
+#endif
 	glDeleteVertexArrays(1, &_vao);
 	glDeleteBuffers(1, &_vbo);
 	glDeleteBuffers(1, &_ebo);
-	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 	
 	free(_vertexes);
 	free(_elements);
@@ -647,9 +663,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 {
 	[self bindVAO:YES];
 	if(renderState == _renderState) return;
-	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCRenderer: Render State");
-	
+#endif
 	// Set the blending state.
 	__unsafe_unretained NSDictionary *blendOptions = renderState->_blendMode->_options;
 	if(blendOptions != _blendOptions){
@@ -701,8 +717,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	}
 	
 	CC_CHECK_GL_ERROR_DEBUG();
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
-	
+#endif
 	_renderState = renderState;
     
 	return;
@@ -839,8 +856,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 
 -(void)flush
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCRenderer: Flush");
-	
+#endif
 	glInsertEventMarkerEXT(0, "Buffering");
 	
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
@@ -862,8 +880,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	
 	_vertexCount = 0;
 	_elementCount = 0;
-	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 	CC_CHECK_GL_ERROR_DEBUG();
     
 //	CC_INCREMENT_GL_DRAWS(1);

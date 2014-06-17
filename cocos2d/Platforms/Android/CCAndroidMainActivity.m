@@ -6,9 +6,9 @@
 //
 //
 
-#if __CC_PLATFORM_ANDROID
-#import "CCAndroidMainActivity.h"
 #import "CCGLView.h"
+
+#if __CC_PLATFORM_ANDROID
 
 @implementation CCAndroidActivity {
     BOOL _initalized;

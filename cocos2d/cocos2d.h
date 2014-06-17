@@ -138,8 +138,10 @@
 #import "Platforms/Mac/NSEvent+CC.h"
 
 #elif __CC_PLATFORM_ANDROID
+#import "Platforms/Android/CCAndroidMainActivity.h"
 #import "Platforms/Android/CCGLView.h"
 #import "Platforms/Android/CCDirectorAndroid.h"
+#import <BridgeKitV3/BridgeKit.h>
 #endif
 
 //

@@ -6,8 +6,12 @@
 //
 //
 
+#import "cocos2d.h"
+//#import "CCDirectorAndroid.h"
+
 #if __CC_PLATFORM_ANDROID
-#import "CCDirectorAndroid.h"
+
+#import <BridgeKitV3/BridgeKit.h>
 
 BRIDGE_CLASS("org.cocos2d.CCAndroidActivity")
 @interface CCAndroidActivity : AndroidActivity
@@ -18,8 +22,11 @@ BRIDGE_CLASS("org.cocos2d.CCAndroidActivity")
 - (void)onPause;
 - (void)onStop;
 
-- (void)surfaceChanged:(AndroidSurfaceHolder *)holder format:(int)format width:(int)w height:(int)h;
+//- (void)surfaceChanged:(AndroidSurfaceHolder *)holder format:(int)format width:(int)w height:(int)h;
 
 @end
 
+
+
 #endif 
+

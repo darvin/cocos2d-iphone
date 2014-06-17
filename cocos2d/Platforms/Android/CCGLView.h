@@ -10,15 +10,18 @@
 
 #if __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
 
+#import <BridgeKitV3/BridgeKit.h>
+
 @interface SurfaceView : NSObject
 
 - (void)onTouchEvent:(id/*MotionEvent*/)event;
 
 @end
 
-@interface AndroidContext : NSObject
-@end
 
+//@interface AndroidContext : NSObject
+//@end
+/*
 @interface EGLDisplay : NSObject
 @end
 
@@ -26,7 +29,7 @@
 @end
 
 @interface EGLContext : NSObject
-@end
+@end*/
 
 #else
 BRIDGE_CLASS("org.cocos2d.CCGLView")

@@ -5,8 +5,10 @@
 //  Created by Oleg Osin on 5/22/14.
 //
 //
-#if __CC_PLATFORM_ANDROID
+#import "cocos2d.h"
 #import "CCGLView.h"
+
+#if __CC_PLATFORM_ANDROID
 
 // Sample BridgeKit syntax
 //@interface CCGLSurfaceView : AndroidSurfaceView
@@ -51,7 +53,6 @@
     EGLint height;
     GLfloat ratio;
     
-    LOG_INFO("Initializing context");
     
     if((_display = eglGetDisplay(EGL_DEFAULT_DISPLAY)) == EGL_NO_DISPLAY)
     {
@@ -68,7 +69,7 @@
     if(!eglChooseConfig(_display, attribs, &config, 1, &numConfigs))
     {
         //LOG_ERROR("eglChooseConfig() returned error %d", eglGetError());
-        return NO
+        return NO;
     }
     
     if(!eglGetConfigAttrib(_display, config, EGL_NATIVE_VISUAL_ID, &format))
@@ -97,8 +98,8 @@
         return NO;
     }
     
-    if(!eglQuerySurface(display, surface, EGL_WIDTH, &width) ||
-        !eglQuerySurface(display, surface, EGL_HEIGHT, &height))
+    if(!eglQuerySurface(_display, _surface, EGL_WIDTH, &width) ||
+        !eglQuerySurface(_display, _surface, EGL_HEIGHT, &height))
     {
         //LOG_ERROR("eglQuerySurface() returned error %d", eglGetError());
         return NO;

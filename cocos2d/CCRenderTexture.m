@@ -156,8 +156,9 @@
 
 -(void)create
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCRenderTexture: Create");
-	
+#endif
     int pixelW = _contentSize.width*_contentScale;
 	int pixelH = _contentSize.height*_contentScale;
 
@@ -221,7 +222,9 @@
 	glBindFramebuffer(GL_FRAMEBUFFER, _oldFBO);
 	
 	CC_CHECK_GL_ERROR_DEBUG();
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 	
     CGRect rect = CGRectMake(0, 0, _contentSize.width, _contentSize.height);
     

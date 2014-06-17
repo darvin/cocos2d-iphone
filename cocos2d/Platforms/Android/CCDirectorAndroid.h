@@ -6,9 +6,9 @@
 //
 //
 
-#if __CC_PLATFORM_ANDROID
-
 #import "../../CCDirector.h"
+
+#if __CC_PLATFORM_ANDROID
 
 @interface CCDirectorAndroid : CCDirector
 

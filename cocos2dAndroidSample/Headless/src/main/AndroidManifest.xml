@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.apportable.Headless" >
+    <application
+        android:allowBackup="true"
+        android:label="Headless"
+        android:debuggable="true">
+        <meta-data android:name="android.app.libs" android:value="v c++ System bridge_runtime icu CoreFoundation xml2 CommonCrypto crypto_1_01g ssl_1_01g Security SystemConfiguration CFNetwork Foundation BridgeKitV3 verde"/>
+        <service android:name="com.apportable.RuntimeService"/>
+        <activity
+            android:name="com.apportable.HeadlessActivity"
+            android:label="Headless" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

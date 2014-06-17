@@ -237,7 +237,9 @@ static CCTexture *CCTextureNone = nil;
 		}
         }];
 #else
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
         glPushGroupMarkerEXT(0, "CCTexture: Init");
+#endif
 		
 		// XXX: 32 bits or POT textures uses UNPACK of 4 (is this correct ??? )
 		if( pixelFormat == CCTexturePixelFormat_RGBA8888 || ( CCNextPOT(width)==width && CCNextPOT(height)==height) )
@@ -304,9 +306,13 @@ static CCTexture *CCTextureNone = nil;
             glPopGroupMarkerEXT();
         }];
 #else
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glPopGroupMarkerEXT();
 #endif
+#endif
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glPopGroupMarkerEXT();
+#endif
 	}
 	return self;
 }
@@ -357,9 +363,13 @@ static CCTexture *CCTextureNone = nil;
 	CCLOGINFO(@"cocos2d: deallocing %@", self);
 
 	if( _name ){
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glPushGroupMarkerEXT(0, "CCTexture: Dealloc");
+#endif
 		glDeleteTextures(1, &_name);
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glPopGroupMarkerEXT();
+#endif
 	}
 }
 
@@ -686,20 +696,27 @@ static BOOL _PVRHaveAlphaPremultiplied = YES;
 
 -(void) generateMipmap
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+    
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCTexture: Generate Mipmap");
+#endif
 	
 	NSAssert( _width == CCNextPOT(_width) && _height == CCNextPOT(_height), @"Mimpap texture only works in POT textures");
 	glBindTexture(GL_TEXTURE_2D, _name);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	_hasMipmaps = YES;
-	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
+#endif
 }
 
 -(void) setTexParameters: (ccTexParams*) texParams
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCTexture: Set Texture Parameters");
-	
+#endif
 	NSAssert( (_width == CCNextPOT(_width) && _height == CCNextPOT(_height)) ||
 				(texParams->wrapS == GL_CLAMP_TO_EDGE && texParams->wrapT == GL_CLAMP_TO_EDGE),
 			@"GL_CLAMP_TO_EDGE should be used in NPOT dimensions");
@@ -709,14 +726,16 @@ static BOOL _PVRHaveAlphaPremultiplied = YES;
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texParams->magFilter );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParams->wrapS );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParams->wrapT );
-	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 }
 
 -(void) setAliasTexParameters
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCTexture: Set Alias Texture Parameters");
-	
+#endif
 	glBindTexture(GL_TEXTURE_2D, _name );
 	
 	if( ! _hasMipmaps )
@@ -727,14 +746,16 @@ static BOOL _PVRHaveAlphaPremultiplied = YES;
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	
     _antialiased = NO;
-	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 }
 
 -(void) setAntiAliasTexParameters
 {
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCTexture: Set Anti-alias Texture Parameters");
-	
+#endif
 	glBindTexture(GL_TEXTURE_2D, _name );
 	
 	if( ! _hasMipmaps )
@@ -745,8 +766,9 @@ static BOOL _PVRHaveAlphaPremultiplied = YES;
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     
     _antialiased = YES;
-	
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPopGroupMarkerEXT();
+#endif
 }
 @end
 

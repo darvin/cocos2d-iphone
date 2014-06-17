@@ -83,7 +83,9 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 static const ccPVRTexturePixelFormatInfo PVRTableFormats[] = {
 	
 	// 0: BGRA_8888
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	{GL_RGBA, GL_BGRA, GL_UNSIGNED_BYTE, 32, NO, YES, CCTexturePixelFormat_RGBA8888},
+#endif
 	// 1: RGBA_8888
 	{GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 32, NO, YES, CCTexturePixelFormat_RGBA8888},
 	// 2: RGBA_4444

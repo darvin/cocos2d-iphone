@@ -22,11 +22,24 @@
  * THE SOFTWARE.
  */
 
+#define TARGET_ANDROID 1
+#ifdef TARGET_ANDROID
+
+#import "cocos2d.h"
+
+@interface AppController : NSObject
+{
+}
+
+#else
+
 #import <UIKit/UIKit.h>
 #import "cocos2d.h"
 
 @interface AppController : CCAppDelegate
 {
 }
+
+#endif
 
 @end
