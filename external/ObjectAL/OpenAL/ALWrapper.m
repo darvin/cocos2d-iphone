@@ -28,6 +28,9 @@
 //
 
 #import "ALWrapper.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import "ObjectALMacros.h"
 #import "ARCSafe_MemMgmt.h"
 #import "OALNotifications.h"
@@ -1809,3 +1812,5 @@ BOOL checkIfSuccessfulWithDevice(const char* contextInfo, ALCdevice* device)
 }
 
 @end
+
+#endif

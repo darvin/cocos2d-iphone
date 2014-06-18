@@ -27,6 +27,10 @@
 // Attribution is not required, but appreciated :)
 //
 
+#import "ccMacros.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import <Foundation/Foundation.h>
 #import "SynthesizeSingleton.h"
 #import "ALDevice.h"
@@ -490,3 +494,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_HEADER(OALSimpleAudio);
 - (void) resetToDefault;
 
 @end
+
+
+#endif // __CC_PLATFORM_IOS || __CC_PLATFORM_MAC

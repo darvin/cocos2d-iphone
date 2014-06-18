@@ -28,6 +28,9 @@
 //
 
 #import "ALBuffer.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import "ALWrapper.h"
 #import "OpenALManager.h"
 #import "ObjectALMacros.h"
@@ -173,3 +176,5 @@
 }
 
 @end
+
+#endif

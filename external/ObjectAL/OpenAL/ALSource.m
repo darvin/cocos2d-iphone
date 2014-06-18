@@ -28,6 +28,9 @@
 //
 
 #import "ALSource.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import "ObjectALMacros.h"
 #import "ARCSafe_MemMgmt.h"
 #import "ALWrapper.h"
@@ -1474,3 +1477,5 @@ static ALvoid alSourceNotification(ALuint sid, ALuint notificationID, ALvoid* us
 
 
 @end
+
+#endif

@@ -27,12 +27,17 @@
 // Attribution is not required, but appreciated :)
 //
 
+#import "ccMacros.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
+
 #import <Foundation/Foundation.h>
 #import "SynthesizeSingleton.h"
 #import "ALContext.h"
-#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if __CC_PLATFORM_IOS
 #import <OpenAL/oalMacOSX_OALExtensions.h>
-#else
+#elif __CC_PLATFORM_MAC
 #import <OpenAL/MacOSX_OALExtensions.h>
 #endif
 
@@ -249,3 +254,5 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_HEADER(OpenALManager);
 /** \endcond */
 
 @end
+
+#endif

@@ -25,6 +25,10 @@
 // Attribution is not required, but appreciated :)
 //
 
+#import "ccMacros.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import "OALAudioTrack.h"
 #import "SynthesizeSingleton.h"
 #import "OALSuspendHandler.h"
@@ -91,3 +95,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS_HEADER(OALAudioTracks);
 /** \endcond */
 
 @end
+
+#endif //__CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+

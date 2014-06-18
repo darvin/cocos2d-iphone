@@ -27,7 +27,11 @@
 // Attribution is not required, but appreciated :)
 //
 
+
 #import "ALCaptureDevice.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import "ALWrapper.h"
 #import "ObjectALMacros.h"
 #import "ARCSafe_MemMgmt.h"
@@ -128,3 +132,5 @@
 
 
 @end
+
+#endif

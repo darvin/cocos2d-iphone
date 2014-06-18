@@ -27,6 +27,11 @@
 // Attribution is not required, but appreciated :)
 //
 
+#import "ccMacros.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
+
 // Actions
 #import "OALAction.h"
 #import "OALAudioActions.h"
@@ -722,3 +727,7 @@
  - Programs that redirect audio can wreak havoc on the simulator. Try removing them.
  
 */
+
+
+#endif
+

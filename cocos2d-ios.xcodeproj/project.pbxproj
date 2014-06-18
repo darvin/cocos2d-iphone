@@ -595,7 +595,6 @@
 		D2FEB73E194F6C9E00FC0574 /* mach_timing.c in Sources */ = {isa = PBXBuildFile; fileRef = B7705FC01831A07B0043CC67 /* mach_timing.c */; };
 		D2FEB73F194F6C9E00FC0574 /* CCPhysicsBody.m in Sources */ = {isa = PBXBuildFile; fileRef = D33803E218032ECE0072D8FE /* CCPhysicsBody.m */; };
 		D2FEB741194F6C9E00FC0574 /* libObjectiveChipmunk-iPhone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B759E52D1880C66900E8166C /* libObjectiveChipmunk-iPhone.a */; };
-		D2FEB743194F6C9E00FC0574 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E3877010446C6E00150883 /* OpenAL.framework */; };
 		D2FEB745194F6C9E00FC0574 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06D9C131728D5F600704732 /* CoreText.framework */; };
 		D2FEB747194F6C9E00FC0574 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		D2FEB749194F6C9E00FC0574 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3623EB0D0F72F000981E51 /* CoreGraphics.framework */; };
@@ -1033,7 +1032,6 @@
 				D2D0E68A1950B12B00E9103F /* libEGL.so in Frameworks */,
 				D2D0E6881950B10C00E9103F /* BridgeKitV3.framework in Frameworks */,
 				D2FEB741194F6C9E00FC0574 /* libObjectiveChipmunk-iPhone.a in Frameworks */,
-				D2FEB743194F6C9E00FC0574 /* OpenAL.framework in Frameworks */,
 				D2FEB745194F6C9E00FC0574 /* CoreText.framework in Frameworks */,
 				D2FEB747194F6C9E00FC0574 /* Foundation.framework in Frameworks */,
 				D2FEB749194F6C9E00FC0574 /* CoreGraphics.framework in Frameworks */,

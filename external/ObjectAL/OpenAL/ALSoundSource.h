@@ -27,6 +27,11 @@
 // Attribution is not required, but appreciated :)
 //
 
+#import "ccMacros.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
+
 #import <Foundation/Foundation.h>
 #import "ALBuffer.h"
 #import "ALTypes.h"
@@ -241,3 +246,5 @@
 - (void) clear;
 
 @end
+
+#endif

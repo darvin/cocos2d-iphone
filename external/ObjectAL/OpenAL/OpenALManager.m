@@ -28,6 +28,9 @@
 //
 
 #import "OpenALManager.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import "NSMutableArray+WeakReferences.h"
 #import "ObjectALMacros.h"
 #import "ARCSafe_MemMgmt.h"
@@ -174,7 +177,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(OpenALManager);
 
 		operationQueue = [[NSOperationQueue alloc] init];
 
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		[[OALAudioSession sharedInstance] addSuspendListener:self];
+#endif
 	}
 	return self;
 }
@@ -182,7 +187,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(OpenALManager);
 - (void) dealloc
 {
 	OAL_LOG_DEBUG(@"%@: Dealloc", self);
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	[[OALAudioSession sharedInstance] removeSuspendListener:self];
+#endif
 
 	as_release(operationQueue);
 	as_release(suspendHandler);
@@ -439,3 +446,5 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(OpenALManager);
 }
 
 @end
+
+#endif

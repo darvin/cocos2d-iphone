@@ -652,7 +652,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 -(void)bindVAO:(BOOL)bind
 {
  	if(bind != _vaoBound){
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glInsertEventMarkerEXT(0, "CCRenderer: Bind VAO");
+#endif
 		glBindVertexArray(bind ? _vao : 0);
 		
 		_vaoBound = bind;
@@ -669,7 +671,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	// Set the blending state.
 	__unsafe_unretained NSDictionary *blendOptions = renderState->_blendMode->_options;
 	if(blendOptions != _blendOptions){
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glInsertEventMarkerEXT(0, "Blending mode");
+#endif
 		
 		if(blendOptions == CCBLEND_DISABLED_OPTIONS){
 			if(_blendOptions != CCBLEND_DISABLED_OPTIONS) glDisable(GL_BLEND);
@@ -695,7 +699,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	// Bind the shader.
 	__unsafe_unretained CCShader *shader = renderState->_shader;
 	if(shader != _shader){
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glInsertEventMarkerEXT(0, "Shader");
+#endif
 		
 		glUseProgram(shader->_program);
 		
@@ -706,7 +712,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 	// Set the shader's uniform state.
 	__unsafe_unretained NSDictionary *shaderUniforms = renderState->_shaderUniforms;
 	if(shaderUniforms != _shaderUniforms){
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 		glInsertEventMarkerEXT(0, "Uniforms");
+#endif
 		
 		__unsafe_unretained NSDictionary *setters = shader->_uniformSetters;
 		for(NSString *uniformName in setters){
@@ -858,9 +866,9 @@ static NSString *CURRENT_RENDERER_KEY = @"CCRendererCurrent";
 {
 #if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
 	glPushGroupMarkerEXT(0, "CCRenderer: Flush");
+    glInsertEventMarkerEXT(0, "Buffering");
 #endif
-	glInsertEventMarkerEXT(0, "Buffering");
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 	glBufferData(GL_ARRAY_BUFFER, _vertexCount*sizeof(*_vertexes), _vertexes, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

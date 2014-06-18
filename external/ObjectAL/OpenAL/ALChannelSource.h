@@ -27,6 +27,10 @@
 // Attribution is not required, but appreciated :)
 //
 
+#import "ccMacros.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import "ALSoundSource.h"
 #import "ALSoundSourcePool.h"
 #import "ALContext.h"
@@ -237,3 +241,5 @@
 - (BOOL) removeBuffersNamed:(NSString*) name;
 
 @end
+
+#endif

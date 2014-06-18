@@ -76,6 +76,7 @@
 		5BAF85A21936C8A90085EA39 /* libGLESv3.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLESv3.so; path = "usr/lib/armv7a-neon/libGLESv3.so"; sourceTree = SDKROOT; };
 		5BCE504E1941161500E057D0 /* BridgeKitV3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BridgeKitV3.framework; path = System/Library/Frameworks/BridgeKitV3.framework; sourceTree = SDKROOT; };
 		5BCE505B1941181E00E057D0 /* libbridge_runtime.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbridge_runtime.so; path = "usr/local/lib/armv7a-neon/libbridge_runtime.so"; sourceTree = SDKROOT; };
+		D2952D3C19520B9A007C58A7 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		D2D0EDEA195125EF00E9103F /* cocos2d-ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "cocos2d-ios.xcodeproj"; path = "../../cocos2d-ios.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -128,6 +129,7 @@
 		5B4D6CBF1936ACE5004D1A0B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D2952D3C19520B9A007C58A7 /* OpenAL.framework */,
 				5BCE505B1941181E00E057D0 /* libbridge_runtime.so */,
 				5BCE504E1941161500E057D0 /* BridgeKitV3.framework */,
 				5BAF85A01936C8A90085EA39 /* libGLESv1_CM.so */,

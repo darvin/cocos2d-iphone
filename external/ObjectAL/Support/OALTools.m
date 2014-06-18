@@ -28,6 +28,9 @@
 //
 
 #import "OALTools.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
 #import "ObjectALMacros.h"
 #import "ARCSafe_MemMgmt.h"
 #import "OALNotifications.h"
@@ -226,3 +229,5 @@ static NSBundle* g_defaultBundle;
 #endif
 
 @end
+
+#endif 

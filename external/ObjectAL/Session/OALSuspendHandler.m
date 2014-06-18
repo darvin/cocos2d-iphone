@@ -28,6 +28,10 @@
 //
 
 #import "OALSuspendHandler.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
+
 #import "NSMutableArray+WeakReferences.h"
 #import "ObjectALMacros.h"
 #import "ARCSafe_MemMgmt.h"
@@ -245,3 +249,5 @@
 }
 
 @end
+
+#endif

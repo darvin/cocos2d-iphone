@@ -28,10 +28,13 @@
 //
 
 #import "ALChannelSource.h"
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_MAC
+
+
 #import "ObjectALMacros.h"
 #import "ARCSafe_MemMgmt.h"
 #import "OpenALManager.h"
-
 
 
 #define SYNTHESIZE_DELEGATE_PROPERTY(NAME, CAPSNAME, TYPE) \
@@ -645,3 +648,5 @@ SYNTHESIZE_DELEGATE_PROPERTY(reverbObstruction, ReverbObstruction, float);
 }
 
 @end
+
+#endif

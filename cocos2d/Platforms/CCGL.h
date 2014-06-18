@@ -43,8 +43,10 @@
 #import "Mac/CCGLView.h"
 
 #elif __CC_PLATFORM_ANDROID
+#define GL_GLEXT_PROTOTYPES 1
 #include <EGL/egl.h> // requires ndk r5 or newer
-#include <GLES/gl.h>
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
 #import "Android/CCGLView.h"
 #endif
 
