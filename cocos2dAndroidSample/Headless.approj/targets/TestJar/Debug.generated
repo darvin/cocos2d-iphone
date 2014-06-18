@@ -1,0 +1,58 @@
+{
+    "assets": [], 
+    "config": {}, 
+    "defines": {
+        "DEBUG": 1, 
+        "__IPHONE_OS_VERSION_MIN_REQUIRED": 70100
+    }, 
+    "deps": [
+        "UIKit"
+    ], 
+    "flags": [
+        "-fobjc-arc", 
+        "-fasm-blocks", 
+        {
+            "flag": "-std=gnu99", 
+            "not_type": "c++"
+        }, 
+        {
+            "flag": "-fgnu-keywords", 
+            "not_type": "c++"
+        }, 
+        "-fno-asm", 
+        "-fpascal-strings", 
+        "-Wempty-body", 
+        "-Wshorten-64-to-32", 
+        "-Wno-deprecated-declarations", 
+        "-Wswitch", 
+        "-Wparentheses", 
+        "-Wformat", 
+        "-Wunused-function", 
+        "-Wunused-value", 
+        "-Wunused-variable", 
+        {
+            "flag": "-Winvalid-offsetof", 
+            "type": "c++"
+        }, 
+        {
+            "flag": "-Wprotocol", 
+            "type": "objc"
+        }, 
+        {
+            "flag": "-Wundeclared-selector", 
+            "type": "objc"
+        }
+    ], 
+    "header_paths": [], 
+    "infoplists": [], 
+    "libs": [], 
+    "modules": [], 
+    "pchs": [], 
+    "sources": [], 
+    "storyboards": [], 
+    "type": "com.apportable.java.product-type.library", 
+    "version": "3", 
+    "xcdatamodels": [], 
+    "xcode_project": "Headless.xcodeproj", 
+    "xibs": []
+}
