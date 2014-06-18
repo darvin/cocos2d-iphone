@@ -6,39 +6,15 @@
 //
 //
 
-#if __CC_PLATFORM_ANDROID
+#import "ccMacros.h"
 
-#if __CC_PLATFORM_ANDROID_COMPILE_ON_IOS_LAWLZ
+#if __CC_PLATFORM_ANDROID
 
 #import <BridgeKitV3/BridgeKit.h>
 
-@interface SurfaceView : NSObject
+@interface CCGLView : NSObject
 
-- (void)onTouchEvent:(id/*MotionEvent*/)event;
-
-@end
-
-
-//@interface AndroidContext : NSObject
-//@end
-/*
-@interface EGLDisplay : NSObject
-@end
-
-@interface EGLSurface : NSObject
-@end
-
-@interface EGLContext : NSObject
-@end*/
-
-#else
-BRIDGE_CLASS("org.cocos2d.CCGLView")
-#endif
-
-@interface CCGLView : SurfaceView
-
-- (id)initWithContext:(AndroidContext *)context;
-- (void)setupView;
+- (void)setupView:(ANativeWindow*)window;
 - (void)swapBuffers;
 - (void)onTouchEvent:(id/*MotionEvent*/)event;
 

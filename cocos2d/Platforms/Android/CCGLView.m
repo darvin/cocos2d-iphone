@@ -8,37 +8,16 @@
 #import "cocos2d.h"
 #import "CCGLView.h"
 
+#import <android/native_window.h>
+#import <bridge/runtime.h>
+
 #if __CC_PLATFORM_ANDROID
 
-// Sample BridgeKit syntax
-//@interface CCGLSurfaceView : AndroidSurfaceView
-//
-//- (id)initWithContext:(AndroidContext)ctx;
-//
-//@end
-//
-//@implementation CCGLSurfaceView
-//
-//@bridge initWithContext: = <init>
-//
-//@end
 
 @implementation CCGLView
 
-- (id)initWithContext:(AndroidContext *)context
+- (BOOL)setupView:(ANativeWindow*)window
 {
-    if((self = [super context]))
-    {
-        return self;
-    }
-    
-    return self;
-}
-
-- (BOOL)setupView
-{
-    ANativeWindow* window = ANativeWindow_fromSurface(bridge_getJava(holder.surface));
-    
     const EGLint attribs[] = {
         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
         EGL_BLUE_SIZE, 8,
@@ -54,7 +33,8 @@
     GLfloat ratio;
     
     
-    if((_display = eglGetDisplay(EGL_DEFAULT_DISPLAY)) == EGL_NO_DISPLAY)
+    _display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if(_display == EGL_NO_DISPLAY)
     {
         //LOG_ERROR("eglGetDisplay() returned error %d", eglGetError());
         return NO;
