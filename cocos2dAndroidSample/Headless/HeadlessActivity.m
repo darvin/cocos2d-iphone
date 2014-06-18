@@ -7,34 +7,23 @@
 //
 
 #import "HeadlessActivity.h"
-#import <BridgeKit/AndroidSurfaceView.h>
 #import <android/native_window.h>
 #import <bridge/runtime.h>
 
-BRIDGE_CLASS("android.view.Surface")
-@interface AndroidViewSurface : JavaObject
-@end
-@implementation AndroidViewSurfacer
+#import "cocos2d.h"
+
+@implementation AndroidViewSurface
 @end
 
-BRIDGE_CLASS("android.view.SurfaceHolder")
-@interface AndroidViewSurfaceHolder : JavaObject
-- (AndroidViewSurface*)surface;
-@end
+
 @implementation AndroidViewSurfaceHolder
 @bridge (instance, method) surface = getSurface;
 @end
 
 
-@interface HeadlessActivity ()
-
-- (void)surfaceCreated:(AndroidViewSurfaceHolder*)holder;
-- (void)surfaceChanged:(AndroidViewSurfaceHolder*)holder format:(int)format width:(int)width height:(int)height;
-- (void)surfaceDestroyed:(AndroidViewSurfaceHolder*)holder;
-
-@end
-
-@implementation HeadlessActivity
+@implementation HeadlessActivity {
+    CCGLView* _glView;
+}
 
 @bridge (callback) onCreated: = onCreated;
 @bridge (callback) surfaceCreated: = surfaceCreated;
@@ -55,9 +44,30 @@ BRIDGE_CLASS("android.view.SurfaceHolder")
 
 - (void)surfaceChanged:(AndroidViewSurfaceHolder*)holder format:(int)format width:(int)width height:(int)height
 {
-        ANativeWindow* window = ANativeWindow_fromSurface(bridge_getJava(holder.surface));
-    // setupView
+    if(_glView != nil)
+        return;
+
+    // Note: temp hack, this all needs be abstracted into cocos2d (the same way it works on iOS)
+    ANativeWindow* window = ANativeWindow_fromSurface(bridge_getJava(holder.surface));
     
+    _glView = [[CCGLView alloc] init];
+    [_glView setupView:window];
+
+    CCDirectorAndroid* director = (CCDirectorAndroid*) [CCDirector sharedDirector];
+    [director setView:_glView];
+    
+    
+    // set FPS at 60
+//	NSTimeInterval animationInterval = [(config[CCSetupAnimationInterval] ?: @(1.0/60.0)) doubleValue];
+//    [director setAnimationInterval:animationInterval];
+//	director.fixedUpdateInterval = [(config[CCSetupFixedUpdateInterval] ?: @(1.0/60.0)) doubleValue];
+
+    [director setProjection:CCDirectorProjection2D];
+    [CCTexture setDefaultAlphaPixelFormat:CCTexturePixelFormat_RGBA8888];
+    
+    [director reshapeProjection:CGSizeMake(width, height)];
+    
+    [[CCDirector sharedDirector] startAnimation];
     
 }
 

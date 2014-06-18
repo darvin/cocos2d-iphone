@@ -8,17 +8,12 @@
 
 #import "CCGLView.h"
 
-#if __CC_PLATFORM_ANDROID
+#if 0//__CC_PLATFORM_ANDROID
+
 
 @implementation CCAndroidActivity {
     BOOL _initalized;
 }
-
-@bridge (callback) onCreate: = onCreate;
-@bridge (callback) onStart = onStart;
-@bridge (callback) onResume = onResume;
-@bridge (callback) onPause = onPause;
-@bridge (callback) surfaceChanged:format:width:height: = surfaceChanged;
 
 - (void)onCreate:(AndroidBundle *)bundle
 {
@@ -147,5 +142,6 @@
 
 
 @end
+
 #endif
 

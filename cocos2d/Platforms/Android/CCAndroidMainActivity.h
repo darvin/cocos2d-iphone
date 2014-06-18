@@ -9,7 +9,7 @@
 #import "cocos2d.h"
 //#import "CCDirectorAndroid.h"
 
-#if __CC_PLATFORM_ANDROID
+#if 0//__CC_PLATFORM_ANDROID
 
 #import <BridgeKitV3/BridgeKit.h>
 

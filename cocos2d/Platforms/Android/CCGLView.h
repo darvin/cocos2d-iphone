@@ -11,6 +11,10 @@
 #if __CC_PLATFORM_ANDROID
 
 #import <BridgeKitV3/BridgeKit.h>
+#import <android/native_window.h>
+#import <bridge/runtime.h>
+
+#import "../../Platforms/CCGL.h"
 
 @interface CCGLView : NSObject
 

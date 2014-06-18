@@ -36,6 +36,8 @@ public class HeadlessActivity extends Activity implements SurfaceHolder.Callback
         });
     }
     
+    
+    
     public native void surfaceCreated(SurfaceHolder holder);
     public native void surfaceChanged(SurfaceHolder holder, int format, int width, int height);
     public native void surfaceDestroyed(SurfaceHolder holder);
