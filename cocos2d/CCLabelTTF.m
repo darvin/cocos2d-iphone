@@ -37,28 +37,44 @@
 #import "CCConfiguration.h"
 #import "CCNode_Private.h"
 #import "CCDirector.h"
+#import "CCTexture_Private.h"
+#import <Foundation/Foundation.h>
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 #import "Platforms/iOS/CCDirectorIOS.h"
+#endif
+
+#if __CC_PLATFORM_IOS || __CC_PLATFORM_ANDROID
 #import <CoreText/CoreText.h>
 #endif
 
+
+
+
+
 static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 
-
-@implementation CCTexture (CCLabelTTF)
-
-- (void) setPremultipliedAlpha:(BOOL)flag
-{
-    _premultipliedAlpha = flag;
-}
-
-@end
 
 #pragma mark CCLabelTTF
 
 
 @implementation CCLabelTTF
++ (void)registerFontsFromAppBundle {
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        NSArray *bundledFonts = [NSBundle mainBundle].infoDictionary[@"UIAppFonts"];
+        NSBundle *appBundle = [NSBundle mainBundle];
+        
+        for (NSString *fontName in bundledFonts) {
+            NSURL *fontURL = [appBundle URLForResource:fontName withExtension:nil];
+
+            if (fontURL != nil) {
+                CTFontManagerRegisterFontsForURL((CFURLRef)fontURL, kCTFontManagerScopeProcess, NULL);
+            }
+        }
+    });
+
+}
 
 + (id) labelWithString:(NSString *)string fontName:(NSString *)name fontSize:(CGFloat)size
 {
@@ -113,6 +129,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 {
     if ( (self = [super init]) )
     {
+        [[self class] registerFontsFromAppBundle];
         if (!fontName) fontName = @"Helvetica";
         if (!fontSize) fontSize = 12;
         
@@ -167,10 +184,9 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 - (void)setFontName:(NSString*)fontName
 {
     // Handle passing of complete file paths
-    if ([[[fontName pathExtension] lowercaseString] isEqualToString:@"ttf"])
+    if ([[[fontName pathExtension] lowercaseString] isEqualToString:@"ttf"] || [[[fontName pathExtension] lowercaseString] isEqualToString:@"otf"])
     {
-        [CCLabelTTF registerCustomTTF:fontName];
-        fontName = [[fontName lastPathComponent] stringByDeletingPathExtension];
+        fontName = [CCLabelTTF registerCustomTTF:fontName];
     }
     
 	if( fontName.hash != _fontName.hash ) {
@@ -329,6 +345,20 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     _isTextureDirty = YES;
 }
 
+-(CCRenderState *)renderState
+{
+	if(_renderState == nil){
+		// Allowing the uniforms to be copied speeds up the rendering by making the render state immutable.
+		// Copy the uniforms if custom uniforms are not being used.
+		BOOL copyUniforms = self.hasDefaultShaderUniforms;
+		
+		// Create an uncached renderstate so the texture can be released before the renderstate cache is flushed.
+		_renderState = [CCRenderState renderStateWithBlendMode:_blendMode shader:_shader shaderUniforms:self.shaderUniforms copyUniforms:copyUniforms];
+	}
+	
+	return _renderState;
+}
+
 
 #pragma mark -
 #pragma mark Render Font Mac & iOS 6
@@ -348,7 +378,6 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     CTFrameDraw(frame, context);
     CGContextRestoreGState(context);
     CFRelease(frame);
-    
 }
 
 - (void) drawString:(NSString *)string withFont:(CTFontRef)font inContext:(CGContextRef) context inRect:(CGRect)rect  {
@@ -379,7 +408,6 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     CFRelease(framesetter);
     
     return suggestedSize;
-
 }
 
 
@@ -390,7 +418,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     
     _isTextureDirty = NO;
     
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
     // Handle fonts on iOS 5
     if ([CCConfiguration sharedConfiguration].OSVersion < CCSystemVersion_iOS_6_0)
     {
@@ -398,128 +426,26 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     }
 #endif
     
-    // Set default values for font attributes if they are not set in the attributed string
-    
     NSMutableAttributedString* formattedAttributedString = [_attributedString mutableCopy];
-    NSRange fullRange = NSMakeRange(0, formattedAttributedString.length);
     
     BOOL useFullColor = NO;
     
     if (_shadowColor.alpha > 0) useFullColor = YES;
     if (_outlineColor.alpha > 0 && _outlineWidth > 0) useFullColor = YES;
     
+    useFullColor |= NSMutableAttributedStringFixPlatformSpecificAttributes(formattedAttributedString, _fontColor, _fontName, _fontSize, _horizontalAlignment);
     
-#if defined(__CC_PLATFORM_IOS)
-    if ([formattedAttributedString hasAttribute:NSForegroundColorAttributeName]) {
-        UIColor * color = [formattedAttributedString attribute:NSForegroundColorAttributeName atIndex:0 effectiveRange:NULL];
-        [formattedAttributedString addAttribute:(id)kCTForegroundColorFromContextAttributeName value:(__bridge id)color.CGColor range:fullRange];
-    }
-    if ([formattedAttributedString hasAttribute:NSFontAttributeName]) {
-        UIFont * font = [formattedAttributedString attribute:NSFontAttributeName atIndex:0 effectiveRange:NULL];
-        CTFontRef ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
-        [formattedAttributedString addAttribute:(id)kCTFontAttributeName value:(__bridge id)ctFont range:fullRange];
-        CFRelease(ctFont);
-    }
-#endif
     
-#if defined(__CC_PLATFORM_IOS) || defined(__CC_PLATFORM_ANDROID)
-    // Font color
-    if (![formattedAttributedString hasAttribute:(id)kCTForegroundColorFromContextAttributeName])
-    {
-        if (![_fontColor isEqualToColor:[CCColor whiteColor]])
-        {
-            useFullColor = YES;
-        }
-        
-        [formattedAttributedString addAttribute:(__bridge id)kCTForegroundColorAttributeName value:(__bridge id)_fontColor.CGColor range:fullRange];
-    }
-    else
-    {
-        useFullColor = YES;
-    }
-    
-    // Font
-    if (![formattedAttributedString hasAttribute:(NSString *)kCTFontAttributeName])
-    {
-        CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)_fontName, _fontSize, NULL);
-        if (font == NULL) font = CTFontCreateWithName(CFSTR("Helvetica"), _fontSize, NULL);
-        [formattedAttributedString addAttribute:(NSString *)kCTFontAttributeName value:(__bridge id)font range:fullRange];
-        CFRelease(font);
-    }
-    
-    // Shadow
-    if ([formattedAttributedString hasAttribute:NSShadowAttributeName])
-    {
-        useFullColor = YES;
-    }
-    
-    // Text alignment
-    if (![formattedAttributedString hasAttribute:NSParagraphStyleAttributeName])
-    {
-        NSMutableParagraphStyle* style = [[NSMutableParagraphStyle alloc] init];
-        
-        if (_horizontalAlignment == CCTextAlignmentLeft) style.alignment = NSTextAlignmentLeft;
-        else if (_horizontalAlignment == CCTextAlignmentCenter) style.alignment = NSTextAlignmentCenter;
-        else if (_horizontalAlignment == CCTextAlignmentRight) style.alignment = NSTextAlignmentRight;
-        
-        [formattedAttributedString addAttribute:NSParagraphStyleAttributeName value:style range:fullRange];
-    }
-    
-#elif defined(__CC_PLATFORM_MAC)
-    // Font color
-    if (![formattedAttributedString hasAttribute:NSForegroundColorAttributeName])
-    {
-        if (![_fontColor isEqualToColor:[CCColor whiteColor]])
-        {
-            useFullColor = YES;
-        }
-        
-        NSColor* color = [NSColor colorWithCalibratedRed:_fontColor.red green:_fontColor.green blue:_fontColor.blue alpha:_fontColor.alpha];
-        
-        [formattedAttributedString addAttribute:NSForegroundColorAttributeName value:color range:fullRange];
-    }
-    else
-    {
-        useFullColor = YES;
-    }
-    
-    // Font
-    if (![formattedAttributedString hasAttribute:NSFontAttributeName])
-    {
-        NSFont* font = [NSFont fontWithName:_fontName size:_fontSize];
-        if (!font) font = [NSFont fontWithName:@"Helvetica" size:_fontSize];
-        [formattedAttributedString addAttribute:NSFontAttributeName value:font range:fullRange];
-    }
-    
-    // Shadow
-    if ([formattedAttributedString hasAttribute:NSShadowAttributeName])
-    {
-        useFullColor = YES;
-    }
-    
-    // Text alignment
-    if (![formattedAttributedString hasAttribute:NSParagraphStyleAttributeName])
-    {
-        NSMutableParagraphStyle* style = [[NSMutableParagraphStyle alloc] init];
-        
-        if (_horizontalAlignment == CCTextAlignmentLeft) style.alignment = NSLeftTextAlignment;
-        else if (_horizontalAlignment == CCTextAlignmentCenter) style.alignment = NSCenterTextAlignment;
-        else if (_horizontalAlignment == CCTextAlignmentRight) style.alignment = NSRightTextAlignment;
-        
-        [formattedAttributedString addAttribute:NSParagraphStyleAttributeName value:style range:fullRange];
-    }
-#endif
-    
-
     // Generate a new texture from the attributed string
 	CCTexture *tex;
     
-	tex = [self createTextureWithAttributedString:[formattedAttributedString copyAdjustedForContentScaleFactor] useFullColor:useFullColor];
-
+    tex = [self createTextureWithAttributedString:NSAttributedStringCopyAdjustedForContentScaleFactor(formattedAttributedString)
+                                     useFullColor:useFullColor];
+    
 	if(!tex) return NO;
     
 	self.shader = (useFullColor ? [CCShader positionTextureColorShader] : [CCShader positionTextureA8ColorShader]);
-
+    
     // Update texture and content size
 	[self setTexture:tex];
 	
@@ -528,6 +454,21 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 	[self setTextureRect: rect];
 	
 	return YES;
+
+}
+
+- (void)applyShadowOnContext:(CGContextRef)context color:(CGColorRef)color blurRadius:(CGFloat)blurRadius offset:(CGPoint)offset {
+
+    CGContextSetShadowWithColor(context, CGSizeMake(offset.x, -offset.y), blurRadius, color);
+
+}
+
+- (void)applyOutlineOnContext:(CGContextRef)context color:(CGColorRef)color width:(CGFloat)width {
+    CGContextSetTextDrawingMode(context, kCGTextStroke);
+    CGContextSetLineWidth(context, width * 2);
+    CGContextSetLineJoin(context, kCGLineJoinRound);
+    CGContextSetStrokeColorWithColor(context, color);
+
 }
 
 - (CCTexture*) createTextureWithAttributedString:(NSAttributedString*)attributedString useFullColor:(BOOL) fullColor
@@ -593,7 +534,9 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         // Handle strings with fixed dimensions
         if (_adjustsFontSizeToFit)
         {
-            CGFloat fontSize = [attributedString singleFontSize];
+
+            CGFloat fontSize = NSAttributedStringSingleFontSize(attributedString);
+
             if (fontSize)
             {
                 // This is a string that can be resized (it only uses one font and size)
@@ -618,7 +561,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
                     CGFloat newFontSize = fontSize * scaleFactor;
                     CGFloat minFontSize = _minimumFontSize * scale;
                     if (minFontSize && newFontSize < minFontSize) newFontSize = minFontSize;
-                    attributedString = [attributedString copyWithNewFontSize:newFontSize];
+                    attributedString = NSAttributedStringCopyWithNewFontSize(attributedString, newFontSize);
                 }
             }
         }
@@ -653,10 +596,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 	if( POTSize.height == 0)
 		POTSize.height = 2;
     
-    // Render the label - different code for Mac / iOS
-    
-#ifdef __CC_PLATFORM_IOS
-	CGRect drawArea = CGRectMake(xOffset, yOffset, wDrawArea, hDrawArea);
+    CGRect drawArea = CGRectMake(xOffset, yOffset, wDrawArea, hDrawArea);
     
     unsigned char* data = calloc(POTSize.width, POTSize.height * 4);
     
@@ -670,105 +610,38 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         return NULL;
     }
     
-	UIGraphicsPushContext(context);
     
-    // Handle shadow
-    if (hasShadow)
-    {
-        CGContextSetShadowWithColor(context, CGSizeMake(shadowOffset.x, -shadowOffset.y), shadowBlurRadius, _shadowColor.CGColor);
+    if (!hasShadow && !hasOutline) {
+        [self drawAttributedString:attributedString inContext:context inRect:drawArea];
+
+    } else if (hasShadow && !hasOutline) {
+        [self applyShadowOnContext:context color:_shadowColor.CGColor blurRadius:shadowBlurRadius offset:shadowOffset];
+        [self drawAttributedString:attributedString inContext:context inRect:drawArea];
+
+    } else if (!hasShadow && hasOutline) {
+        CGContextSaveGState(context);
+        [self applyOutlineOnContext:context color:_outlineColor.CGColor width:outlineWidth];
+        [self drawAttributedString:attributedString inContext:context inRect:drawArea];
+        CGContextRestoreGState(context);
+        [self drawAttributedString:attributedString inContext:context inRect:drawArea];
+
+
+    } else if (hasShadow && hasOutline) {
+        CGContextSaveGState(context);
+        [self applyOutlineOnContext:context color:_outlineColor.CGColor width:outlineWidth];
+        [self applyShadowOnContext:context color:_shadowColor.CGColor blurRadius:shadowBlurRadius offset:shadowOffset];
+        [self drawAttributedString:attributedString inContext:context inRect:drawArea];
+        CGContextRestoreGState(context);
+        CGContextSaveGState(context);
+        [self applyOutlineOnContext:context color:_outlineColor.CGColor width:outlineWidth];
+        [self drawAttributedString:attributedString inContext:context inRect:drawArea];
+        CGContextRestoreGState(context);
+        [self drawAttributedString:attributedString inContext:context inRect:drawArea];
+
+
     }
     
-    // Handle outline
-    if (hasOutline)
-    {
-        CGContextSetTextDrawingMode(context, kCGTextFillStroke);
-        CGContextSetLineWidth(context, outlineWidth * 2);
-        CGContextSetLineJoin(context, kCGLineJoinRound);
-
-        NSMutableAttributedString* outlineString = [attributedString mutableCopy];
-        [outlineString addAttribute:NSForegroundColorAttributeName value:(__bridge id)_outlineColor.CGColor range:NSMakeRange(0, outlineString.length)];
-        
-        [self drawAttributedString:outlineString inContext:context inRect:drawArea];
-
-        // Don't draw shadow for main font
-        CGContextSetShadowWithColor(context, CGSizeZero, 0, NULL);
-
-        if (hasShadow)
-        {
-            // Draw outline again because shadow overlap
-            [self drawAttributedString:outlineString inContext:context inRect:drawArea];
-        }
-        CGContextSetTextDrawingMode(context, kCGTextFill);
-    }
-    
-    [self drawAttributedString:attributedString inContext:context inRect:drawArea];
-    
-    UIGraphicsPopContext();
     CGContextRelease(context);
-    
-#elif defined(__CC_PLATFORM_MAC)
-    yOffset = (POTSize.height - hDrawArea) - yOffset;
-	
-	CGRect drawArea = CGRectMake(xOffset, yOffset, wDrawArea, hDrawArea);
-	
-	NSImage *image = [[NSImage alloc] initWithSize:POTSize];
-	[image lockFocus];
-    [[NSAffineTransform transform] set];
-    
-    // XXX: The shadows are for some reason scaled on OS X if a retina display is connected
-    CGFloat retinaFix = 1;
-    for (NSScreen* screen in [NSScreen screens])
-    {
-        if (screen.backingScaleFactor > retinaFix) retinaFix = screen.backingScaleFactor;
-    }
-    
-    CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
-		CGContextSaveGState(context);
-		CGContextConcatCTM(context, CGAffineTransformMake(1.0, 0.0, 0.0, -1.0, 0.0, POTSize.height));
-    
-    // Handle shadow
-    if (hasShadow || hasOutline)
-    {
-        NSMutableAttributedString* effectsString = [attributedString mutableCopy];
-        
-        if (hasShadow)
-        {
-
-            NSColor* color = [NSColor colorWithCalibratedRed:_shadowColor.red green:_shadowColor.green blue:_shadowColor.blue alpha:_shadowColor.alpha];
-            
-            CGContextSetShadowWithColor(context, CGSizeMake(shadowOffset.x/retinaFix, -shadowOffset.y/retinaFix), shadowBlurRadius/retinaFix, [color CGColor]);
-        }
-        
-        if (hasOutline)
-        {
-            
-            CGContextSetTextDrawingMode(context, kCGTextFillStroke);
-            CGContextSetLineWidth(context, outlineWidth * 2);
-            CGContextSetLineJoin(context, kCGLineJoinRound);
-            
-            NSColor* color = [NSColor colorWithCalibratedRed:_outlineColor.red green:_outlineColor.green blue:_outlineColor.blue alpha:_outlineColor.alpha];
-            
-            [effectsString addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, effectsString.length)];
-            
-            [effectsString drawWithRect:NSRectFromCGRect(drawArea) options:NSStringDrawingUsesLineFragmentOrigin];
-            
-            if (hasShadow)
-            {
-                CGContextSetShadowWithColor(context, CGSizeZero, 0, NULL);
-                [self drawAttributedString:effectsString inContext:context inRect:drawArea withFont:NULL];
-            }
-            CGContextSetTextDrawingMode(context, kCGTextFill);
-        }
-    }
-	
-    [attributedString drawWithRect:NSRectFromCGRect(drawArea) options:NSStringDrawingUsesLineFragmentOrigin];
-		CGContextRestoreGState(context);
-	
-	NSBitmapImageRep *bitmap = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect (0.0f, 0.0f, POTSize.width, POTSize.height)];
-	[image unlockFocus];
-    
-	unsigned char *data = (unsigned char*) [bitmap bitmapData];  //Use the same buffer to improve the performance.
-#endif
     
     CCTexture* texture = NULL;
     
@@ -776,7 +649,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
     if (fullColor)
     {
         // RGBA8888 format
-				texture = [[CCTexture alloc] initWithData:data pixelFormat:CCTexturePixelFormat_RGBA8888 pixelsWide:POTSize.width pixelsHigh:POTSize.height contentSizeInPixels:dimensions contentScale:[CCDirector sharedDirector].contentScaleFactor];
+        texture = [[CCTexture alloc] initWithData:data pixelFormat:CCTexturePixelFormat_RGBA8888 pixelsWide:POTSize.width pixelsHigh:POTSize.height contentSizeInPixels:dimensions contentScale:[CCDirector sharedDirector].contentScaleFactor];
         [texture setPremultipliedAlpha:YES];
     }
     else
@@ -792,9 +665,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         self.shader = [CCShader positionTextureA8ColorShader];
     }
     
-#ifdef __CC_PLATFORM_IOS
-    free(data); // On Mac data is freed by NSBitmapImageRep
-#endif
+    free(data);
     
 	return texture;
 }
@@ -803,7 +674,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 #pragma mark -
 #pragma mark Render Font iOS 5
 
-#ifdef __CC_PLATFORM_IOS
+#if __CC_PLATFORM_IOS
 - (BOOL) updateTextureOld
 {
     NSString* string = [self string];
@@ -966,11 +837,16 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 
     if (!context)
     {
+        if (font != NULL) {
+            CFRelease(font);
+        }
         free(data);
         return NULL;
     }
 
+#if __CC_PLATFORM_IOS
     UIGraphicsPushContext(context);
+#endif
     
     // Handle shadow
     if (hasShadow)
@@ -1016,7 +892,9 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 
     [self drawString:string withFont:font inContext:context inRect:drawArea];
 
+#if __CC_PLATFORM_IOS
     UIGraphicsPopContext();
+#endif
     CGContextRelease(context);
 
     CCTexture* texture = NULL;
@@ -1052,7 +930,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 #pragma mark -
 #pragma mark Handle HTML
 
-#ifdef __CC_PLATFORM_MAC
+#if __CC_PLATFORM_MAC
 - (void) setHTML:(NSString *)html
 {
     NSData* data = [html dataUsingEncoding:NSUTF8StringEncoding];
@@ -1065,7 +943,7 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
 
 #pragma mark Class functions
 
-+ (void) registerCustomTTF:(NSString *)fontFile
++ (NSString*) registerCustomTTF:(NSString *)fontFile
 {
     // Do not register a font if it has already been registered
     if (!ccLabelTTF_registeredFonts)
@@ -1073,17 +951,46 @@ static __strong NSMutableDictionary* ccLabelTTF_registeredFonts;
         ccLabelTTF_registeredFonts = [[NSMutableDictionary alloc] init];
     }
     
-    if ([ccLabelTTF_registeredFonts objectForKey:fontFile]) return;
-    [ccLabelTTF_registeredFonts setObject:[NSNumber numberWithBool:YES] forKey:fontFile];
+    if ([ccLabelTTF_registeredFonts objectForKey:fontFile]) return [ccLabelTTF_registeredFonts objectForKey:fontFile];
+    
     
     // Register with font manager
-    if ([[fontFile lowercaseString] hasSuffix:@".ttf"])
+    if ([[fontFile lowercaseString] hasSuffix:@".ttf"] || [[fontFile lowercaseString] hasSuffix:@".otf"])
     {
         // This is a file, register font with font manager
         NSString* fontPath = [[CCFileUtils sharedFileUtils] fullPathForFilename:fontFile];
+        NSCAssert(fontPath != nil, @"FontFile can not be located");
+        
         NSURL* fontURL = [NSURL fileURLWithPath:fontPath];
         CTFontManagerRegisterFontsForURL((__bridge CFURLRef)fontURL, kCTFontManagerScopeProcess, NULL);
+        NSString *fontName = nil;
+#if __CC_PLATFORM_IOS
+        BOOL needsCGFontFailback = [[[UIDevice currentDevice] systemVersion] compare:@"7.0" options:NSNumericSearch] != NSOrderedAscending;
+#else
+        BOOL needsCGFontFailback = NO;
+#endif
+        if (!needsCGFontFailback) {
+            CFArrayRef descriptors = CTFontManagerCreateFontDescriptorsFromURL((__bridge CFURLRef)fontURL);
+            if (!descriptors || CFArrayGetCount(descriptors)<1) {
+                return nil;
+            }
+            CTFontDescriptorRef descriptor = CFArrayGetValueAtIndex(descriptors, 0);
+            fontName = (__bridge NSString *)CTFontDescriptorCopyAttribute(descriptor, kCTFontNameAttribute);
+            CFRelease(descriptors);
+            
+        } else {
+            CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontURL);
+            CGFontRef loadedFont = CGFontCreateWithDataProvider(fontDataProvider);
+            fontName = (__bridge NSString *)CGFontCopyPostScriptName(loadedFont);
+            
+            CGFontRelease(loadedFont);
+            CGDataProviderRelease(fontDataProvider);
+        }
+        
+        [ccLabelTTF_registeredFonts setObject:fontName forKey:fontFile];
+        return fontName;
     }
+    return nil;
 }
 
 @end

@@ -35,14 +35,8 @@
 #import "CCDirector.h"
 #import "CCCache.h"
 #import "CCGL.h"
-
-
-enum {
-	CCAttributePosition,
-	CCAttributeTexCoord1,
-	CCAttributeTexCoord2,
-	CCAttributeColor,
-};
+#import "CCRenderDispatch.h"
+#import "CCMetalSupport_Private.h"
 
 
 const NSString *CCShaderUniformProjection = @"cc_Projection";
@@ -54,6 +48,7 @@ const NSString *CCShaderUniformSinTime = @"cc_SinTime";
 const NSString *CCShaderUniformCosTime = @"cc_CosTime";
 const NSString *CCShaderUniformRandom01 = @"cc_Random01";
 const NSString *CCShaderUniformMainTexture = @"cc_MainTexture";
+const NSString *CCShaderUniformNormalMapTexture = @"cc_NormalMapTexture";
 const NSString *CCShaderUniformAlphaTestValue = @"cc_AlphaTestValue";
 
 
@@ -78,8 +73,9 @@ static const GLchar *CCShaderHeader =
 	"uniform highp vec4 cc_SinTime;\n"
 	"uniform highp vec4 cc_CosTime;\n"
 	"uniform highp vec4 cc_Random01;\n\n"
-	"uniform lowp sampler2D cc_MainTexture;\n\n"
-	"varying lowp vec4 cc_FragColor;\n"
+	"uniform " XSTR(CC_SHADER_COLOR_PRECISION) " sampler2D cc_MainTexture;\n\n"
+	"uniform " XSTR(CC_SHADER_COLOR_PRECISION) " sampler2D cc_NormalMapTexture;\n\n"
+	"varying " XSTR(CC_SHADER_COLOR_PRECISION) " vec4 cc_FragColor;\n"
 	"varying highp vec2 cc_FragTexCoord1;\n"
 	"varying highp vec2 cc_FragTexCoord2;\n\n"
 	"// End Cocos2D shader header.\n\n";
@@ -97,7 +93,8 @@ static const GLchar *CCVertexShaderHeader =
 
 static const GLchar *CCFragmentShaderHeader =
 	"#ifdef GL_ES\n"
-	"precision mediump float;\n\n"
+	"precision " XSTR(CC_SHADER_DEFAULT_FRAGMENT_PRECISION) " float;\n"
+    "#extension GL_OES_standard_derivatives : enable\n"
 	"#endif\n\n"
 	"// End Cocos2D fragment shader header.\n\n";
 
@@ -171,6 +168,7 @@ CompileShader(GLenum type, const char *source)
 
 -(id)createSharedDataForKey:(id<NSCopying>)key
 {
+#warning TODO Need Metal path here.
 	NSString *shaderName = (NSString *)key;
 	
 	NSString *fragmentName = [shaderName stringByAppendingPathExtension:@"fsh"];
@@ -200,54 +198,45 @@ CompileShader(GLenum type, const char *source)
 	BOOL _ownsProgram;
 }
 
-+(GLuint)createVAOforCCVertexBuffer:(GLuint)vbo elementBuffer:(GLuint)ebo
+//MARK: GL Uniform Setters:
+
+static CCGLUniformSetter
+GLUniformSetFloat(NSString *name, GLint location)
 {
-	glPushGroupMarkerEXT(0, "CCShader: Creating vertex buffer");
-	
-	GLuint vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glEnableVertexAttribArray(CCAttributePosition);
-	glEnableVertexAttribArray(CCAttributeTexCoord1);
-	glEnableVertexAttribArray(CCAttributeTexCoord2);
-	glEnableVertexAttribArray(CCAttributeColor);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(CCAttributePosition, 4, GL_FLOAT, GL_FALSE, sizeof(CCVertex), (void *)offsetof(CCVertex, position));
-	glVertexAttribPointer(CCAttributeTexCoord1, 2, GL_FLOAT, GL_FALSE, sizeof(CCVertex), (void *)offsetof(CCVertex, texCoord1));
-	glVertexAttribPointer(CCAttributeTexCoord2, 2, GL_FLOAT, GL_FALSE, sizeof(CCVertex), (void *)offsetof(CCVertex, texCoord2));
-	glVertexAttribPointer(CCAttributeColor, 4, GL_FLOAT, GL_FALSE, sizeof(CCVertex), (void *)offsetof(CCVertex, color));
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	
-	glPopGroupMarkerEXT();
-	
-	return vao;
-}
-
-//MARK: Uniform Setters:
-
-static CCUniformSetter
-SetFloat(NSString *name, GLint location)
-{
-	return ^(CCRenderer *renderer, NSNumber *value){
-		value = value ?: @0;
+	return ^(CCRenderer *renderer, NSDictionary *shaderUniforms, NSDictionary *globalShaderUniforms){
+		NSNumber *value = shaderUniforms[name] ?: globalShaderUniforms[name] ?: @(0.0);
 		NSCAssert([value isKindOfClass:[NSNumber class]], @"Shader uniform '%@' value must be wrapped in a NSNumber.", name);
 		
 		glUniform1f(location, value.floatValue);
 	};
 }
 
-static CCUniformSetter
-SetVec2(NSString *name, GLint location)
+static CCGLUniformSetter
+GLUniformSetVec2(NSString *name, GLint location)
 {
-	return ^(CCRenderer *renderer, NSValue *value){
-		value = value ?: [NSValue valueWithGLKVector2:GLKVector2Make(0.0f, 0.0f)];
+	NSString *textureName = nil;
+	bool pixelSize = [name hasSuffix:@"PixelSize"];
+	if(pixelSize){
+		textureName = [name substringToIndex:name.length - @"PixelSize".length];
+	} else if([name hasSuffix:@"Size"]){
+		textureName = [name substringToIndex:name.length - @"Size".length];
+	}
+	
+	return ^(CCRenderer *renderer, NSDictionary *shaderUniforms, NSDictionary *globalShaderUniforms){
+		NSValue *value = shaderUniforms[name] ?: globalShaderUniforms[name];
+		
+		// Fall back on looking up the actual texture size if the name matches a texture.
+		if(value == nil && textureName){
+			CCTexture *texture = shaderUniforms[textureName] ?: globalShaderUniforms[textureName];
+			GLKVector2 sizeInPixels = GLKVector2Make(texture.pixelWidth, texture.pixelHeight);
+			
+			GLKVector2 size = GLKVector2MultiplyScalar(sizeInPixels, pixelSize ? 1.0 : 1.0/texture.contentScale);
+			value = [NSValue valueWithGLKVector2:size];
+		}
+		
+		// Finally fall back on 0.
+		if(value == nil) value = [NSValue valueWithGLKVector2:GLKVector2Make(0.0f, 0.0f)];
+		
 		NSCAssert([value isKindOfClass:[NSValue class]], @"Shader uniform '%@' value must be wrapped in a NSValue.", name);
 		
 		if(strcmp(value.objCType, @encode(GLKVector2)) == 0){
@@ -265,11 +254,11 @@ SetVec2(NSString *name, GLint location)
 	};
 }
 
-static CCUniformSetter
-SetVec3(NSString *name, GLint location)
+static CCGLUniformSetter
+GLUniformSetVec3(NSString *name, GLint location)
 {
-	return ^(CCRenderer *renderer, NSValue *value){
-		value = value ?: [NSValue valueWithGLKVector3:GLKVector3Make(0.0f, 0.0f, 0.0f)];
+	return ^(CCRenderer *renderer, NSDictionary *shaderUniforms, NSDictionary *globalShaderUniforms){
+		NSValue *value = shaderUniforms[name] ?: globalShaderUniforms[name] ?: [NSValue valueWithGLKVector3:GLKVector3Make(0.0f, 0.0f, 0.0f)];
 		NSCAssert([value isKindOfClass:[NSValue class]], @"Shader uniform '%@' value must be wrapped in a NSValue.", name);
 		NSCAssert(strcmp(value.objCType, @encode(GLKVector3)) == 0, @"Shader uniformm 'vec3 %@' value must be passed using [NSValue valueWithGLKVector3:]", name);
 		
@@ -278,11 +267,11 @@ SetVec3(NSString *name, GLint location)
 	};
 }
 
-static CCUniformSetter
-SetVec4(NSString *name, GLint location)
+static CCGLUniformSetter
+GLUniformSetVec4(NSString *name, GLint location)
 {
-	return ^(CCRenderer *renderer, id value){
-		value = value ?: [NSValue valueWithGLKVector4:GLKVector4Make(0.0f, 0.0f, 0.0f, 1.0f)];
+	return ^(CCRenderer *renderer, NSDictionary *shaderUniforms, NSDictionary *globalShaderUniforms){
+		NSValue *value = shaderUniforms[name] ?: globalShaderUniforms[name] ?: [NSValue valueWithGLKVector4:GLKVector4Make(0.0f, 0.0f, 0.0f, 1.0f)];
 		
 		if([value isKindOfClass:[NSValue class]]){
 			NSCAssert(strcmp([(NSValue *)value objCType], @encode(GLKVector4)) == 0, @"Shader uniformm 'vec4 %@' value must be passed using [NSValue valueWithGLKVector4:].", name);
@@ -298,11 +287,11 @@ SetVec4(NSString *name, GLint location)
 	};
 }
 
-static CCUniformSetter
-SetMat4(NSString *name, GLint location)
+static CCGLUniformSetter
+GLUniformSetMat4(NSString *name, GLint location)
 {
-	return ^(CCRenderer *renderer, NSValue *value){
-		value = value ?: [NSValue valueWithGLKMatrix4:GLKMatrix4Identity];
+	return ^(CCRenderer *renderer, NSDictionary *shaderUniforms, NSDictionary *globalShaderUniforms){
+		NSValue *value = shaderUniforms[name] ?: globalShaderUniforms[name] ?: [NSValue valueWithGLKMatrix4:GLKMatrix4Identity];
 		NSCAssert([value isKindOfClass:[NSValue class]], @"Shader uniform '%@' value must be wrapped in a NSValue.", name);
 		NSCAssert(strcmp(value.objCType, @encode(GLKMatrix4)) == 0, @"Shader uniformm 'mat4 %@' value must be passed using [NSValue valueWithGLKMatrix4:]", name);
 		
@@ -311,7 +300,8 @@ SetMat4(NSString *name, GLint location)
 	};
 }
 
--(NSDictionary *)uniformSettersForProgram:(GLuint)program
+static NSDictionary *
+GLUniformSettersForProgram(GLuint program)
 {
 	NSMutableDictionary *uniformSetters = [NSMutableDictionary dictionary];
 	
@@ -329,24 +319,24 @@ SetMat4(NSString *name, GLint location)
 		GLenum type = 0;
 		
 		glGetActiveUniform(program, i, sizeof(cname), &length, &size, &type, cname);
-		NSAssert(size == 1, @"Uniform arrays not supported. (yet?)");
+		NSCAssert(size == 1, @"Uniform arrays not supported. (yet?)");
 		
 		NSString *name = @(cname);
 		GLint location = glGetUniformLocation(program, cname);
 		
 		// Setup a block that is responsible for binding that uniform variable's value.
 		switch(type){
-			default: NSAssert(NO, @"Uniform type not supported. (yet?)");
-			case GL_FLOAT: uniformSetters[name] = SetFloat(name, location); break;
-			case GL_FLOAT_VEC2: uniformSetters[name] = SetVec2(name, location); break;
-			case GL_FLOAT_VEC3: uniformSetters[name] = SetVec3(name, location); break;
-			case GL_FLOAT_VEC4: uniformSetters[name] = SetVec4(name, location); break;
-			case GL_FLOAT_MAT4: uniformSetters[name] = SetMat4(name, location); break;
+			default: NSCAssert(NO, @"Uniform type not supported. (yet?)");
+			case GL_FLOAT: uniformSetters[name] = GLUniformSetFloat(name, location); break;
+			case GL_FLOAT_VEC2: uniformSetters[name] = GLUniformSetVec2(name, location); break;
+			case GL_FLOAT_VEC3: uniformSetters[name] = GLUniformSetVec3(name, location); break;
+			case GL_FLOAT_VEC4: uniformSetters[name] = GLUniformSetVec4(name, location); break;
+			case GL_FLOAT_MAT4: uniformSetters[name] = GLUniformSetMat4(name, location); break;
 			case GL_SAMPLER_2D: {
 				// Sampler setters are handled a differently since the real work is binding the texture and not setting the uniform value.
-				uniformSetters[name] = ^(CCRenderer *renderer, CCTexture *texture){
-					texture = texture ?: [CCTexture none];
-					NSAssert([texture isKindOfClass:[CCTexture class]], @"Shader uniform '%@' value must be a CCTexture object.", name);
+				uniformSetters[name] = ^(CCRenderer *renderer, NSDictionary *shaderUniforms, NSDictionary *globalShaderUniforms){
+					CCTexture *texture = shaderUniforms[name] ?: globalShaderUniforms[name] ?: [CCTexture none];
+					NSCAssert([texture isKindOfClass:[CCTexture class]], @"Shader uniform '%@' value must be a CCTexture object.", name);
 					
 					// Bind the texture to the texture unit for the uniform.
 					glActiveTexture(GL_TEXTURE0 + textureUnit);
@@ -365,8 +355,10 @@ SetMat4(NSString *name, GLint location)
 
 //MARK: Init Methods:
 
--(instancetype)initWithProgram:(GLuint)program uniformSetters:(NSDictionary *)uniformSetters ownsProgram:(BOOL)ownsProgram
+-(instancetype)initWithGLProgram:(GLuint)program uniformSetters:(NSDictionary *)uniformSetters ownsProgram:(BOOL)ownsProgram
 {
+	NSAssert([CCConfiguration sharedConfiguration].graphicsAPI == CCGraphicsAPIGL, @"GL graphics not configured.");
+	
 	if((self = [super init])){
 		_program = program;
 		_uniformSetters = uniformSetters;
@@ -376,31 +368,55 @@ SetMat4(NSString *name, GLint location)
 	return self;
 }
 
+#if __CC_METAL_SUPPORTED_AND_ENABLED
+-(instancetype)initWithMetalVertexFunction:(id<MTLFunction>)vertexFunction fragmentFunction:(id<MTLFunction>)fragmentFunction
+{
+	if((self = [super init])){
+		_vertexFunction = vertexFunction;
+		_fragmentFunction = fragmentFunction;
+		
+		#warning TODO setup _uniformSetters
+//		_uniformSetters = uniformSetters;
+	}
+	
+	return self;
+}
+#endif
+
 -(instancetype)initWithVertexShaderSource:(NSString *)vertexSource fragmentShaderSource:(NSString *)fragmentSource
 {
-	glPushGroupMarkerEXT(0, "CCShader: Init");
+	#warning TODO
+	if([CCConfiguration sharedConfiguration].graphicsAPI == CCGraphicsAPIMetal) return self;
 	
-	GLuint program = glCreateProgram();
-	glBindAttribLocation(program, CCAttributePosition, "cc_Position");
-	glBindAttribLocation(program, CCAttributeTexCoord1, "cc_TexCoord1");
-	glBindAttribLocation(program, CCAttributeTexCoord2, "cc_TexCoord2");
-	glBindAttribLocation(program, CCAttributeColor, "cc_Color");
+	__block typeof(self) blockself = self;
 	
-	GLint vshader = CompileShader(GL_VERTEX_SHADER, vertexSource.UTF8String);
-	glAttachShader(program, vshader);
+	CCRenderDispatch(NO, ^{
+		CCGL_DEBUG_PUSH_GROUP_MARKER("CCShader: Init");
+		
+		GLuint program = glCreateProgram();
+		glBindAttribLocation(program, CCShaderAttributePosition, "cc_Position");
+		glBindAttribLocation(program, CCShaderAttributeTexCoord1, "cc_TexCoord1");
+		glBindAttribLocation(program, CCShaderAttributeTexCoord2, "cc_TexCoord2");
+		glBindAttribLocation(program, CCShaderAttributeColor, "cc_Color");
+		
+		GLint vshader = CompileShader(GL_VERTEX_SHADER, vertexSource.UTF8String);
+		glAttachShader(program, vshader);
+		
+		GLint fshader = CompileShader(GL_FRAGMENT_SHADER, fragmentSource.UTF8String);
+		glAttachShader(program, fshader);
+		
+		glLinkProgram(program);
+		NSCAssert(CCCheckShaderError(program, GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog), @"Error linking shader program");
+		
+		glDeleteShader(vshader);
+		glDeleteShader(fshader);
+		
+		CCGL_DEBUG_POP_GROUP_MARKER();
+		
+		blockself = [blockself initWithGLProgram:program uniformSetters:GLUniformSettersForProgram(program) ownsProgram:YES];
+	});
 	
-	GLint fshader = CompileShader(GL_FRAGMENT_SHADER, fragmentSource.UTF8String);
-	glAttachShader(program, fshader);
-	
-	glLinkProgram(program);
-	NSCAssert(CCCheckShaderError(program, GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog), @"Error linking shader program");
-	
-	glDeleteShader(vshader);
-	glDeleteShader(fshader);
-	
-	glPopGroupMarkerEXT();
-	
-	return [self initWithProgram:program uniformSetters:[self uniformSettersForProgram:program] ownsProgram:YES];
+	return blockself;
 }
 
 -(instancetype)initWithFragmentShaderSource:(NSString *)source
@@ -412,12 +428,17 @@ SetMat4(NSString *name, GLint location)
 {
 	CCLOGINFO( @"cocos2d: deallocing %@", self);
 
-	if(_ownsProgram && _program) glDeleteProgram(_program);
+	GLuint program = _program;
+	if(_ownsProgram && program){
+		CCRenderDispatch(YES, ^{
+			glDeleteProgram(program);
+		});
+	}
 }
 
 -(instancetype)copyWithZone:(NSZone *)zone
 {
-	return [[CCShader allocWithZone:zone] initWithProgram:_program uniformSetters:_uniformSetters ownsProgram:NO];
+	return [[CCShader allocWithZone:zone] initWithGLProgram:_program uniformSetters:_uniformSetters ownsProgram:NO];
 }
 
 static CCShaderCache *CC_SHADER_CACHE = nil;
@@ -428,27 +449,52 @@ static CCShader *CC_SHADER_POS_TEX_COLOR_ALPHA_TEST = nil;
 
 +(void)initialize
 {
-	CC_SHADER_CACHE = [[CCShaderCache alloc] init];
+	// +initialize may be called due to loading a subclass.
+	if(self != [CCShader class]) return;
 	
-	// Setup the builtin shaders.
-	CC_SHADER_POS_COLOR = [[self alloc] initWithFragmentShaderSource:@"void main(){gl_FragColor = cc_FragColor;}"];
-	CC_SHADER_POS_COLOR.debugName = @"CCPositionColorShader";
+	NSAssert([CCConfiguration sharedConfiguration].graphicsAPI != CCGraphicsAPIInvalid, @"Graphics API not configured.");
 	
-	CC_SHADER_POS_TEX_COLOR = [[self alloc] initWithFragmentShaderSource:@"void main(){gl_FragColor = cc_FragColor*texture2D(cc_MainTexture, cc_FragTexCoord1);}"];
-	CC_SHADER_POS_TEX_COLOR.debugName = @"CCPositionTextureColorShader";
-	
-	CC_SHADER_POS_TEXA8_COLOR = [[self alloc] initWithFragmentShaderSource:@"void main(){gl_FragColor = cc_FragColor*texture2D(cc_MainTexture, cc_FragTexCoord1).a;}"];
-	CC_SHADER_POS_TEXA8_COLOR.debugName = @"CCPositionTextureA8ColorShader";
-	
-	CC_SHADER_POS_TEX_COLOR_ALPHA_TEST = [[self alloc] initWithFragmentShaderSource:CC_GLSL(
-		uniform float cc_AlphaTestValue;
-		void main(){
-			vec4 tex = texture2D(cc_MainTexture, cc_FragTexCoord1);
-			if(tex.a <= cc_AlphaTestValue) discard;
-			gl_FragColor = cc_FragColor*tex;
-		}
-	)];
-	CC_SHADER_POS_TEX_COLOR_ALPHA_TEST.debugName = @"CCPositionTextureColorAlphaTestShader";
+#if __CC_METAL_SUPPORTED_AND_ENABLED
+	if([CCConfiguration sharedConfiguration].graphicsAPI == CCGraphicsAPIMetal){
+		id<MTLLibrary> library = [CCMetalContext currentContext].library;
+		id<MTLFunction> vertex = [library newFunctionWithName:@"CCVertexFunctionDefault"];
+		
+		CC_SHADER_POS_COLOR = [[self alloc] initWithMetalVertexFunction:vertex fragmentFunction:[library newFunctionWithName:@"CCFragmentFunctionDefaultColor"]];
+		CC_SHADER_POS_COLOR.debugName = @"CCPositionColorShader";
+		
+		CC_SHADER_POS_TEX_COLOR = [[self alloc] initWithMetalVertexFunction:vertex fragmentFunction:[library newFunctionWithName:@"CCFragmentFunctionDefaultTextureColor"]];
+		CC_SHADER_POS_TEX_COLOR.debugName = @"CCPositionTextureColorShader";
+		
+		CC_SHADER_POS_TEXA8_COLOR = [[self alloc] initWithMetalVertexFunction:vertex fragmentFunction:[library newFunctionWithName:@"CCFragmentFunctionDefaultTextureA8Color"]];
+		CC_SHADER_POS_TEXA8_COLOR.debugName = @"CCPositionTextureA8ColorShader";
+		
+		CC_SHADER_POS_TEX_COLOR_ALPHA_TEST = [[self alloc] initWithMetalVertexFunction:vertex fragmentFunction:[library newFunctionWithName:@"CCFragmentFunctionUnsupported"]];
+		CC_SHADER_POS_TEX_COLOR_ALPHA_TEST.debugName = @"CCPositionTextureColorAlphaTestShader";
+	} else
+#endif
+	{
+		CC_SHADER_CACHE = [[CCShaderCache alloc] init];
+		
+		// Setup the builtin shaders.
+		CC_SHADER_POS_COLOR = [[self alloc] initWithFragmentShaderSource:@"void main(){gl_FragColor = cc_FragColor;}"];
+		CC_SHADER_POS_COLOR.debugName = @"CCPositionColorShader";
+		
+		CC_SHADER_POS_TEX_COLOR = [[self alloc] initWithFragmentShaderSource:@"void main(){gl_FragColor = cc_FragColor*texture2D(cc_MainTexture, cc_FragTexCoord1);}"];
+		CC_SHADER_POS_TEX_COLOR.debugName = @"CCPositionTextureColorShader";
+		
+		CC_SHADER_POS_TEXA8_COLOR = [[self alloc] initWithFragmentShaderSource:@"void main(){gl_FragColor = cc_FragColor*texture2D(cc_MainTexture, cc_FragTexCoord1).a;}"];
+		CC_SHADER_POS_TEXA8_COLOR.debugName = @"CCPositionTextureA8ColorShader";
+		
+		CC_SHADER_POS_TEX_COLOR_ALPHA_TEST = [[self alloc] initWithFragmentShaderSource:CC_GLSL(
+			uniform float cc_AlphaTestValue;
+			void main(){
+				vec4 tex = texture2D(cc_MainTexture, cc_FragTexCoord1);
+				if(tex.a <= cc_AlphaTestValue) discard;
+				gl_FragColor = cc_FragColor*tex;
+			}
+		)];
+		CC_SHADER_POS_TEX_COLOR_ALPHA_TEST.debugName = @"CCPositionTextureColorAlphaTestShader";
+	}
 }
 
 +(instancetype)positionColorShader

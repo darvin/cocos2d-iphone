@@ -36,6 +36,15 @@
 #define CC_GLSL(x) @#x
 
 
+/// GL attribute locations for built-in Cocos2D vertex attributes.
+typedef NS_ENUM(NSUInteger, CCShaderAttribute){
+	CCShaderAttributePosition,
+	CCShaderAttributeTexCoord1,
+	CCShaderAttributeTexCoord2,
+	CCShaderAttributeColor,
+};
+
+
 extern const NSString *CCShaderUniformProjection;
 extern const NSString *CCShaderUniformProjectionInv;
 extern const NSString *CCShaderUniformViewSize;
@@ -45,6 +54,7 @@ extern const NSString *CCShaderUniformSinTime;
 extern const NSString *CCShaderUniformCosTime;
 extern const NSString *CCShaderUniformRandom01;
 extern const NSString *CCShaderUniformMainTexture;
+extern const NSString *CCShaderUniformNormalMapTexture;
 extern const NSString *CCShaderUniformAlphaTestValue;
 
 
